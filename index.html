@@ -12,19 +12,50 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: #f3f4f6; min-height: 100vh; }
     
+    /* 登录页面 */
+    .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+    .login-box { background: white; border-radius: 1rem; padding: 2rem; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+    .login-logo { text-align: center; font-size: 3rem; margin-bottom: 1rem; }
+    .login-title { text-align: center; font-size: 1.5rem; font-weight: bold; color: #1f2937; margin-bottom: 2rem; }
+    .login-tabs { display: flex; margin-bottom: 1.5rem; border-bottom: 2px solid #e5e7eb; }
+    .login-tab { flex: 1; padding: 0.75rem; text-align: center; cursor: pointer; color: #6b7280; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
+    .login-tab.active { color: #4f46e5; border-bottom-color: #4f46e5; font-weight: 500; }
+    .login-form { display: none; }
+    .login-form.active { display: block; }
+    .login-input { width: 100%; padding: 0.75rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; margin-bottom: 1rem; font-size: 1rem; }
+    .login-input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+    .login-btn { width: 100%; padding: 0.75rem; background: #4f46e5; color: white; border: none; border-radius: 0.5rem; font-size: 1rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .login-btn:hover { background: #4338ca; }
+    .login-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+    .login-error { color: #ef4444; font-size: 0.875rem; margin-top: 0.5rem; text-align: center; display: none; }
+    .login-success { color: #10b981; font-size: 0.875rem; margin-top: 0.5rem; text-align: center; display: none; }
+    
+    /* 导航栏 */
     .navbar { background: #4f46e5; color: white; padding: 1rem; position: sticky; top: 0; z-index: 100; }
-    .navbar h1 { font-size: 1.25rem; margin-bottom: 0.75rem; }
+    .navbar h1 { font-size: 1.25rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
     .nav-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
     .nav-tab { padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; background: transparent; color: white; border: none; transition: all 0.2s; }
     .nav-tab:hover { background: rgba(255,255,255,0.2); }
     .nav-tab.active { background: white; color: #4f46e5; font-weight: 500; }
     
+    /* 用户菜单 */
+    .user-menu { position: relative; }
+    .user-btn { display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 2rem; cursor: pointer; border: none; color: white; font-size: 0.875rem; }
+    .user-dropdown { position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: white; border-radius: 0.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.15); min-width: 150px; display: none; z-index: 1000; }
+    .user-dropdown.show { display: block; }
+    .user-dropdown button { width: 100%; padding: 0.75rem 1rem; border: none; background: none; text-align: left; cursor: pointer; color: #374151; font-size: 0.875rem; display: flex; align-items: center; gap: 0.5rem; }
+    .user-dropdown button:hover { background: #f3f4f6; }
+    .user-dropdown button.danger { color: #ef4444; }
+    
+    /* 主容器 */
     .container { max-width: 1000px; margin: 0 auto; padding: 1rem; }
     .page-title { font-size: 1.5rem; font-weight: bold; color: #1f2937; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
     
+    /* 卡片 */
     .card { background: white; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .card-title { font-size: 1.125rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem; }
     
+    /* 统计卡片 */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
     .stat-card { background: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid; }
     .stat-card.green { border-left-color: #10b981; }
@@ -36,7 +67,8 @@
     .stat-value.red { color: #ef4444; }
     .stat-value.blue { color: #3b82f6; }
     
-    .btn { padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; border: none; font-weight: 500; transition: all 0.2s; }
+    /* 按钮 */
+    .btn { padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; border: none; font-weight: 500; transition: all 0.2s; font-size: 0.875rem; }
     .btn-primary { background: #4f46e5; color: white; }
     .btn-primary:hover { background: #4338ca; }
     .btn-secondary { background: #e5e7eb; color: #374151; }
@@ -45,17 +77,22 @@
     .btn-danger:hover { background: #dc2626; }
     .btn-success { background: #10b981; color: white; }
     .btn-success:hover { background: #059669; }
+    .btn-sm { padding: 0.25rem 0.75rem; font-size: 0.75rem; }
     
+    /* 表格 */
     .table { width: 100%; border-collapse: collapse; }
     .table th, .table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
     .table th { background: #f9fafb; font-weight: 500; color: #6b7280; font-size: 0.875rem; }
     .table tr:hover { background: #f9fafb; }
     
+    /* 表单 */
     .form-group { margin-bottom: 1rem; }
     .form-label { display: block; font-weight: 500; color: #374151; margin-bottom: 0.5rem; }
     .form-input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; }
     .form-input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+    .form-select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; background: white; }
     
+    /* 类型切换 */
     .type-toggle { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
     .type-btn { flex: 1; padding: 0.75rem; border: 2px solid; border-radius: 0.5rem; cursor: pointer; font-weight: 500; background: white; transition: all 0.2s; }
     .type-btn.expense { border-color: #ef4444; color: #ef4444; }
@@ -63,6 +100,7 @@
     .type-btn.income { border-color: #10b981; color: #10b981; }
     .type-btn.income.active { background: #ecfdf5; }
     
+    /* 分类网格 */
     .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
     .category-btn { padding: 0.75rem 0.5rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; cursor: pointer; background: white; text-align: center; transition: all 0.2s; }
     .category-btn:hover { background: #f3f4f6; }
@@ -70,15 +108,17 @@
     .category-btn .icon { font-size: 1.5rem; display: block; margin-bottom: 0.25rem; }
     .category-btn .name { font-size: 0.75rem; color: #374151; }
     
+    /* 模态框 */
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
     .modal { background: white; border-radius: 1rem; padding: 1.5rem; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
     .modal-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 1.5rem; }
+    .modal-sm { max-width: 400px; }
     
+    /* 浮动按钮 */
     .fab { position: fixed; bottom: 1.5rem; right: 1.5rem; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: #4f46e5; color: white; border: none; font-size: 2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4); transition: all 0.2s; }
     .fab:hover { background: #4338ca; transform: scale(1.1); }
     
-    .month-selector { display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; }
-    
+    /* 交易列表 */
     .transaction-item { display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem; }
     .transaction-left { display: flex; align-items: center; gap: 0.75rem; }
     .transaction-icon { font-size: 1.75rem; }
@@ -93,28 +133,21 @@
     .edit-btn { color: #4f46e5; }
     .delete-btn { color: #ef4444; }
     
+    /* 空状态 */
     .empty-state { text-align: center; padding: 3rem; color: #6b7280; }
     .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
     
+    /* 预算进度条 */
     .budget-bar { width: 100%; height: 1rem; background: #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-bottom: 0.5rem; }
     .budget-bar-fill { height: 100%; transition: width 0.3s; }
     .budget-bar-fill.green { background: #10b981; }
     .budget-bar-fill.yellow { background: #f59e0b; }
     .budget-bar-fill.red { background: #ef4444; }
     
+    /* 导出按钮组 */
     .export-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
-    .chart-container { height: 300px; display: flex; align-items: center; justify-content: center; color: #6b7280; }
     
-    .hidden { display: none !important; }
-    .flex { display: flex; }
-    .gap-2 { gap: 0.5rem; }
-    .gap-4 { gap: 1rem; }
-    .mt-4 { margin-top: 1rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .text-sm { font-size: 0.875rem; }
-    .text-center { text-align: center; }
-    
-    /* 同步状态指示器 */
+    /* 同步状态 */
     .sync-status { position: fixed; top: 4.5rem; right: 1rem; padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem; z-index: 50; }
     .sync-status.synced { background: #dcfce7; color: #166534; }
     .sync-status.syncing { background: #fef3c7; color: #92400e; }
@@ -126,151 +159,212 @@
     
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     
-    /* 饼图 */
-    .pie-chart { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2rem; padding: 1rem; }
-    .pie-legend { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
-    .pie-legend-item { display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; }
-    .pie-legend-color { width: 12px; height: 12px; border-radius: 2px; }
+    /* 用户标签 */
+    .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 500; }
+    .badge-admin { background: #fef3c7; color: #92400e; }
+    .badge-user { background: #e0e7ff; color: #3730a3; }
+    
+    /* 隐藏 */
+    .hidden { display: none !important; }
+    
+    /* 工具类 */
+    .flex { display: flex; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-4 { gap: 1rem; }
+    .mt-4 { margin-top: 1rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .text-sm { font-size: 0.875rem; }
+    .text-center { text-align: center; }
+    .text-red { color: #ef4444; }
+    .text-green { color: #10b981; }
   </style>
 </head>
 <body>
-  <!-- 导航栏 -->
-  <nav class="navbar">
-    <h1>💰 记账助手</h1>
-    <div class="nav-tabs">
-      <button class="nav-tab active" data-tab="dashboard">概览</button>
-      <button class="nav-tab" data-tab="transactions">记账</button>
-      <button class="nav-tab" data-tab="statistics">统计</button>
-      <button class="nav-tab" data-tab="budget">预算</button>
-      <button class="nav-tab" data-tab="export">导出</button>
+  <!-- 登录页面 -->
+  <div id="login-page" class="login-container">
+    <div class="login-box">
+      <div class="login-logo">💰</div>
+      <h1 class="login-title">记账助手</h1>
+      
+      <div class="login-tabs">
+        <div class="login-tab active" data-tab="login">登录</div>
+        <div class="login-tab" data-tab="register">注册</div>
+      </div>
+      
+      <!-- 登录表单 -->
+      <form id="login-form" class="login-form active">
+        <input type="text" id="login-username" class="login-input" placeholder="用户名" required>
+        <input type="password" id="login-password" class="login-input" placeholder="密码" required>
+        <button type="submit" class="login-btn" id="login-btn">登录</button>
+        <p class="login-error" id="login-error"></p>
+      </form>
+      
+      <!-- 注册表单 -->
+      <form id="register-form" class="login-form">
+        <input type="text" id="reg-username" class="login-input" placeholder="用户名" required>
+        <input type="password" id="reg-password" class="login-input" placeholder="密码（至少6位）" required minlength="6">
+        <input type="password" id="reg-password2" class="login-input" placeholder="确认密码" required>
+        <button type="submit" class="login-btn" id="register-btn">注册</button>
+        <p class="login-success" id="reg-success"></p>
+        <p class="login-error" id="reg-error"></p>
+      </form>
     </div>
-  </nav>
-  
-  <!-- 同步状态 -->
-  <div class="sync-status synced" id="sync-status">
-    <span class="sync-dot"></span>
-    <span id="sync-text">已同步</span>
   </div>
   
-  <!-- 主容器 -->
-  <main class="container">
-    <!-- 概览页 -->
-    <section id="dashboard" class="page">
-      <div class="page-title">
-        <span>月度概览</span>
-        <input type="month" id="dashboard-month" class="form-input" style="width: auto;">
-      </div>
-      
-      <div class="stats-grid">
-        <div class="stat-card green">
-          <div class="stat-label">本月收入</div>
-          <div class="stat-value green" id="stat-income">¥0.00</div>
+  <!-- 主应用 -->
+  <div id="app-page" class="hidden">
+    <nav class="navbar">
+      <h1>
+        <span>💰 记账助手</span>
+        <div class="user-menu">
+          <button class="user-btn" id="user-btn">
+            <span>👤</span>
+            <span id="current-username">用户</span>
+            <span>▼</span>
+          </button>
+          <div class="user-dropdown" id="user-dropdown">
+            <button id="btn-profile" class="hidden">👤 个人设置</button>
+            <button id="btn-admin" class="hidden">⚙️ 管理面板</button>
+            <button id="btn-logout">🚪 退出登录</button>
+          </div>
         </div>
-        <div class="stat-card red">
-          <div class="stat-label">本月支出</div>
-          <div class="stat-value red" id="stat-expense">¥0.00</div>
-        </div>
-        <div class="stat-card blue">
-          <div class="stat-label">本月结余</div>
-          <div class="stat-value blue" id="stat-balance">¥0.00</div>
-        </div>
+      </h1>
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="dashboard">概览</button>
+        <button class="nav-tab" data-tab="transactions">记账</button>
+        <button class="nav-tab" data-tab="statistics">统计</button>
+        <button class="nav-tab" data-tab="budget">预算</button>
+        <button class="nav-tab" data-tab="export">导出</button>
       </div>
-      
-      <div class="card">
-        <div class="card-title">最近交易</div>
-        <div id="recent-transactions"></div>
-      </div>
-    </section>
+    </nav>
     
-    <!-- 记账页 -->
-    <section id="transactions" class="page hidden">
-      <div class="page-title">
-        <span>记账</span>
-        <div class="flex gap-2">
-          <input type="month" id="transactions-month" class="form-input" style="width: auto;">
-          <button class="btn btn-primary" id="btn-add-transaction">+ 添加记录</button>
+    <!-- 同步状态 -->
+    <div class="sync-status synced" id="sync-status">
+      <span class="sync-dot"></span>
+      <span id="sync-text">已同步</span>
+    </div>
+    
+    <main class="container">
+      <!-- 概览页 -->
+      <section id="dashboard" class="page">
+        <div class="page-title">
+          <span>月度概览</span>
+          <input type="month" id="dashboard-month" class="form-input" style="width: auto;">
         </div>
-      </div>
-      
-      <div class="card">
-        <div id="transactions-list"></div>
-      </div>
-    </section>
-    
-    <!-- 统计页 -->
-    <section id="statistics" class="page hidden">
-      <div class="page-title">统计分析</div>
-      
-      <div class="card">
-        <div class="card-title">支出分布</div>
-        <div id="pie-chart" class="pie-chart"></div>
-      </div>
-      
-      <div class="card">
-        <div class="card-title">收支对比（最近6个月）</div>
-        <div id="bar-chart" class="chart-container">暂无数据</div>
-      </div>
-    </section>
-    
-    <!-- 预算页 -->
-    <section id="budget" class="page hidden">
-      <div class="page-title">预算管理</div>
-      
-      <div class="card">
-        <div class="card-title">月度预算</div>
-        <div class="form-group">
-          <label class="form-label">设置本月预算</label>
-          <div class="flex gap-2">
-            <input type="number" id="budget-input" class="form-input" placeholder="0.00" style="width: 200px;">
-            <span style="line-height: 3;">元</span>
-            <button class="btn btn-primary" id="btn-save-budget">保存</button>
+        
+        <div class="stats-grid">
+          <div class="stat-card green">
+            <div class="stat-label">本月收入</div>
+            <div class="stat-value green" id="stat-income">¥0.00</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-label">本月支出</div>
+            <div class="stat-value red" id="stat-expense">¥0.00</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">本月结余</div>
+            <div class="stat-value blue" id="stat-balance">¥0.00</div>
           </div>
         </div>
         
-        <div id="budget-progress" class="hidden">
-          <div class="flex justify-content-between mb-4">
-            <span>已使用</span>
-            <span id="budget-used">¥0 / ¥0</span>
-          </div>
-          <div class="budget-bar">
-            <div class="budget-bar-fill green" id="budget-bar-fill"></div>
-          </div>
-          <p class="text-sm mt-4" id="budget-status"></p>
+        <div class="card">
+          <div class="card-title">最近交易</div>
+          <div id="recent-transactions"></div>
         </div>
-      </div>
+      </section>
       
-      <div class="card">
-        <div class="card-title">分类支出明细</div>
-        <div id="category-expenses"></div>
-      </div>
-    </section>
+      <!-- 记账页 -->
+      <section id="transactions" class="page hidden">
+        <div class="page-title">
+          <span>记账</span>
+          <div class="flex gap-2">
+            <input type="month" id="transactions-month" class="form-input" style="width: auto;">
+            <button class="btn btn-primary" id="btn-add-transaction">+ 添加记录</button>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div id="transactions-list"></div>
+        </div>
+      </section>
+      
+      <!-- 统计页 -->
+      <section id="statistics" class="page hidden">
+        <div class="page-title">统计分析</div>
+        <div class="card">
+          <div class="card-title">支出分布</div>
+          <div id="pie-chart"></div>
+        </div>
+      </section>
+      
+      <!-- 预算页 -->
+      <section id="budget" class="page hidden">
+        <div class="page-title">预算管理</div>
+        
+        <div class="card">
+          <div class="card-title">月度预算</div>
+          <div class="form-group">
+            <label class="form-label">设置本月预算</label>
+            <div class="flex gap-2">
+              <input type="number" id="budget-input" class="form-input" placeholder="0.00" style="width: 200px;">
+              <span style="line-height: 3;">元</span>
+              <button class="btn btn-primary" id="btn-save-budget">保存</button>
+            </div>
+          </div>
+          
+          <div id="budget-progress" class="hidden">
+            <div class="flex-between mb-4">
+              <span>已使用</span>
+              <span id="budget-used">¥0 / ¥0</span>
+            </div>
+            <div class="budget-bar">
+              <div class="budget-bar-fill green" id="budget-bar-fill"></div>
+            </div>
+            <p class="text-sm mt-4" id="budget-status"></p>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-title">分类支出明细</div>
+          <div id="category-expenses"></div>
+        </div>
+      </section>
+      
+      <!-- 导出页 -->
+      <section id="export" class="page hidden">
+        <div class="page-title">数据导出</div>
+        
+        <div class="card">
+          <div class="card-title">导出数据</div>
+          <p class="text-sm mb-4" id="export-info">共 0 条记录</p>
+          <div class="export-grid">
+            <button class="btn btn-success" id="btn-export-csv">📊 导出 CSV</button>
+            <button class="btn btn-primary" id="btn-export-json">📄 导出 JSON</button>
+            <button class="btn btn-secondary" id="btn-export-html">📈 导出 Excel</button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 用户管理页（管理员） -->
+      <section id="admin" class="page hidden">
+        <div class="page-title">用户管理</div>
+        
+        <div class="card">
+          <div class="card-title flex-between">
+            <span>用户列表</span>
+            <button class="btn btn-primary btn-sm" id="btn-add-user">+ 添加用户</button>
+          </div>
+          <div id="users-list"></div>
+        </div>
+      </section>
+    </main>
     
-    <!-- 导出页 -->
-    <section id="export" class="page hidden">
-      <div class="page-title">数据导出</div>
-      
-      <div class="card">
-        <div class="card-title">导出数据</div>
-        <p class="text-sm mb-4" id="export-info">共 0 条记录</p>
-        <div class="export-grid">
-          <button class="btn btn-success" id="btn-export-csv">📊 导出 CSV</button>
-          <button class="btn btn-primary" id="btn-export-json">📄 导出 JSON</button>
-          <button class="btn btn-secondary" id="btn-export-html">📈 导出 Excel</button>
-        </div>
-      </div>
-      
-      <div class="card">
-        <div class="card-title">危险操作</div>
-        <p class="text-sm mb-4">以下操作不可恢复，请谨慎使用</p>
-        <button class="btn btn-danger" id="btn-clear-data">🗑️ 清空所有数据</button>
-      </div>
-    </section>
-  </main>
+    <!-- 浮动添加按钮 -->
+    <button class="fab hidden" id="fab-add">+</button>
+  </div>
   
-  <!-- 浮动添加按钮 -->
-  <button class="fab hidden" id="fab-add">+</button>
-  
-  <!-- 添加/编辑模态框 -->
+  <!-- 添加/编辑交易模态框 -->
   <div class="modal-overlay hidden" id="modal">
     <div class="modal">
       <h3 class="modal-title" id="modal-title">添加记录</h3>
@@ -304,6 +398,39 @@
         
         <div class="flex gap-2 mt-4">
           <button type="button" class="btn btn-secondary" id="btn-cancel" style="flex: 1;">取消</button>
+          <button type="submit" class="btn btn-primary" style="flex: 1;">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- 添加用户模态框 -->
+  <div class="modal-overlay hidden" id="user-modal">
+    <div class="modal modal-sm">
+      <h3 class="modal-title" id="user-modal-title">添加用户</h3>
+      <form id="user-form">
+        <input type="hidden" id="edit-user-id">
+        
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input type="text" id="new-username" class="form-input" placeholder="用户名" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" id="new-password" class="form-input" placeholder="密码（至少6位）" required minlength="6">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">角色</label>
+          <select id="new-role" class="form-select">
+            <option value="user">普通用户</option>
+            <option value="admin">管理员</option>
+          </select>
+        </div>
+        
+        <div class="flex gap-2 mt-4">
+          <button type="button" class="btn btn-secondary" id="btn-user-cancel" style="flex: 1;">取消</button>
           <button type="submit" class="btn btn-primary" style="flex: 1;">保存</button>
         </div>
       </form>
@@ -344,6 +471,7 @@
     };
 
     // ==================== 状态 ====================
+    let currentUser = null;
     let transactions = [];
     let budgets = { total: 0 };
     let currentTab = 'dashboard';
@@ -351,7 +479,6 @@
     let selectedCategory = 'food';
     let editingId = null;
     let isOnline = navigator.onLine;
-    let pendingSync = false;
 
     // ==================== Supabase 客户端 ====================
     class SupabaseClient {
@@ -414,19 +541,141 @@
 
     const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
+    // 简单加密（实际生产请用更安全的方式）
+    const simpleHash = (str) => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      return hash.toString(16);
+    };
+
     // ==================== 同步状态 ====================
     const updateSyncStatus = (status, text) => {
       const el = $('#sync-status');
-      el.className = `sync-status ${status}`;
-      $('#sync-text').textContent = text;
+      if (el) {
+        el.className = `sync-status ${status}`;
+        $('#sync-text').textContent = text;
+      }
+    };
+
+    // ==================== 认证相关 ====================
+    const checkAuth = () => {
+      const saved = localStorage.getItem('currentUser');
+      if (saved) {
+        currentUser = JSON.parse(saved);
+        return true;
+      }
+      return false;
+    };
+
+    const saveAuth = () => {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    };
+
+    const clearAuth = () => {
+      localStorage.removeItem('currentUser');
+      currentUser = null;
+    };
+
+    const showApp = () => {
+      $('#login-page').classList.add('hidden');
+      $('#app-page').classList.remove('hidden');
+      $('#current-username').textContent = currentUser.username;
+      
+      // 显示管理按钮
+      if (currentUser.role === 'admin') {
+        $('#btn-admin').classList.remove('hidden');
+        $('#btn-profile').classList.remove('hidden');
+      }
+      
+      // 添加管理员标签页
+      if (currentUser.role === 'admin') {
+        const adminTab = document.createElement('button');
+        adminTab.className = 'nav-tab';
+        adminTab.dataset.tab = 'admin';
+        adminTab.textContent = '用户管理';
+        document.querySelector('.nav-tabs').appendChild(adminTab);
+      }
+      
+      initApp();
+    };
+
+    const showLogin = () => {
+      $('#login-page').classList.remove('hidden');
+      $('#app-page').classList.add('hidden');
+    };
+
+    // 登录
+    const login = async (username, password) => {
+      try {
+        const users = await supabase.get('users', `?username=eq.${username}`);
+        if (!users || users.length === 0) {
+          throw new Error('用户不存在');
+        }
+        
+        const user = users[0];
+        if (user.password !== simpleHash(password)) {
+          throw new Error('密码错误');
+        }
+        
+        currentUser = {
+          id: user.id,
+          username: user.username,
+          role: user.role
+        };
+        saveAuth();
+        showApp();
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    };
+
+    // 注册
+    const register = async (username, password) => {
+      try {
+        // 检查用户名是否已存在
+        const existing = await supabase.get('users', `?username=eq.${username}`);
+        if (existing && existing.length > 0) {
+          throw new Error('用户名已存在');
+        }
+        
+        // 创建用户
+        const newUser = {
+          id: generateId(),
+          username,
+          password: simpleHash(password),
+          role: 'user',
+          created_at: new Date().toISOString()
+        };
+        
+        await supabase.post('users', newUser);
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    };
+
+    // 登出
+    const logout = () => {
+      clearAuth();
+      transactions = [];
+      budgets = { total: 0 };
+      showLogin();
     };
 
     // ==================== 数据同步 ====================
     const loadFromCloud = async () => {
+      if (!currentUser) return;
+      
       try {
         updateSyncStatus('syncing', '同步中...');
-        const data = await supabase.get('transactions', '?order=date.desc');
         
+        // 加载交易记录
+        const data = await supabase.get('transactions', `?user_id=eq.${currentUser.id}&order=date.desc`);
         if (data && data.length > 0) {
           transactions = data.map(t => ({
             id: t.id,
@@ -436,20 +685,23 @@
             date: t.date,
             note: t.note || ''
           }));
-          // 保存到本地
           localStorage.setItem('transactions', JSON.stringify(transactions));
+        } else {
+          transactions = [];
         }
         
-        const budgetsData = await supabase.get('budgets', '?limit=1');
+        // 加载预算
+        const budgetsData = await supabase.get('budgets', `?user_id=eq.${currentUser.id}&limit=1`);
         if (budgetsData && budgetsData.length > 0) {
           budgets = { total: budgetsData[0].total || 0 };
           localStorage.setItem('budgets', JSON.stringify(budgets));
+        } else {
+          budgets = { total: 0 };
         }
         
         updateSyncStatus('synced', '已同步');
       } catch (err) {
         console.error('Load failed:', err);
-        // 离线，从本地加载
         transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
         budgets = JSON.parse(localStorage.getItem('budgets') || '{"total": 0}');
         updateSyncStatus('offline', '离线模式');
@@ -457,21 +709,14 @@
     };
 
     const syncToCloud = async (transaction, action = 'upsert') => {
-      if (!isOnline) {
-        pendingSync = true;
-        return;
-      }
+      if (!isOnline || !currentUser) return;
 
       try {
         updateSyncStatus('syncing', '同步中...');
         
         const data = {
-          id: transaction.id,
-          type: transaction.type,
-          amount: transaction.amount,
-          category: transaction.category,
-          date: transaction.date,
-          note: transaction.note || '',
+          ...transaction,
+          user_id: currentUser.id,
           updated_at: new Date().toISOString()
         };
 
@@ -621,14 +866,14 @@
       
       const container = $('#pie-chart');
       if (pieData.length === 0) {
-        container.innerHTML = '<div class="chart-container">暂无数据</div>';
+        container.innerHTML = '<div class="empty-state"><div class="icon">📊</div><p>暂无数据</p></div>';
         return;
       }
 
       const total = Object.values(stats.expenseByCategory).reduce((a, b) => a + b, 0);
       let html = '<div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; align-items: center;">';
       
-      pieData.forEach(([catId, amount], index) => {
+      pieData.forEach(([catId, amount]) => {
         const cat = CATEGORIES.expense.find(c => c.id === catId);
         const color = EXPENSE_COLORS[catId] || '#6b7280';
         const percent = ((amount / total) * 100).toFixed(1);
@@ -689,22 +934,46 @@
       $('#export-info').textContent = `共 ${transactions.length} 条记录`;
     };
 
-    const renderStatistics = () => {
-      renderPieChart();
-      const barDiv = $('#bar-chart');
-      const months = [];
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date();
-        d.setMonth(d.getMonth() - i);
-        months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+    const renderAdmin = async () => {
+      if (!currentUser || currentUser.role !== 'admin') return;
+      
+      try {
+        const users = await supabase.get('users', '?order=created_at.desc');
+        const list = $('#users-list');
+        
+        if (!users || users.length === 0) {
+          list.innerHTML = '<div class="empty-state"><p>暂无用户</p></div>';
+          return;
+        }
+        
+        list.innerHTML = `
+          <table class="table">
+            <thead>
+              <tr>
+                <th>用户名</th>
+                <th>角色</th>
+                <th>创建时间</th>
+                <th style="text-align: right;">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${users.map(u => `
+                <tr>
+                  <td>${u.username}</td>
+                  <td><span class="badge ${u.role === 'admin' ? 'badge-admin' : 'badge-user'}">${u.role === 'admin' ? '管理员' : '用户'}</span></td>
+                  <td>${formatDate(u.created_at)}</td>
+                  <td style="text-align: right;">
+                    <button class="btn btn-sm btn-secondary" onclick="editUser('${u.id}')">编辑</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" ${u.id === currentUser.id ? 'disabled' : ''}>删除</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (err) {
+        console.error('Load users failed:', err);
       }
-
-      const hasData = months.some(m => {
-        const t = getMonthlyTransactions(m);
-        return t.length > 0;
-      });
-
-      barDiv.innerHTML = hasData ? '<div style="text-align: center;">近6个月趋势数据已生成</div>' : '<div class="chart-container">暂无数据</div>';
     };
 
     const switchTab = (tab) => {
@@ -716,14 +985,15 @@
       $(`#${tab}`).classList.remove('hidden');
       
       const fab = $('#fab-add');
-      fab.classList.toggle('hidden', tab === 'statistics' || tab === 'budget' || tab === 'export');
+      fab.classList.toggle('hidden', tab === 'statistics' || tab === 'budget' || tab === 'export' || tab === 'admin');
 
       switch (tab) {
         case 'dashboard': renderDashboard(); break;
         case 'transactions': renderTransactions(); break;
-        case 'statistics': renderStatistics(); break;
+        case 'statistics': renderPieChart(); break;
         case 'budget': renderBudget(); break;
         case 'export': renderExport(); break;
+        case 'admin': renderAdmin(); break;
       }
     };
 
@@ -792,12 +1062,96 @@
       switch (currentTab) {
         case 'dashboard': renderDashboard(); break;
         case 'transactions': renderTransactions(); break;
-        case 'statistics': renderStatistics(); break;
+        case 'statistics': renderPieChart(); break;
         case 'budget': renderBudget(); break;
         case 'export': renderExport(); break;
+        case 'admin': renderAdmin(); break;
       }
     };
 
+    // 用户管理
+    window.editUser = async (id) => {
+      try {
+        const users = await supabase.get('users', `?id=eq.${id}`);
+        if (users && users.length > 0) {
+          const u = users[0];
+          $('#edit-user-id').value = u.id;
+          $('#new-username').value = u.username;
+          $('#new-password').value = '';
+          $('#new-role').value = u.role;
+          $('#user-modal-title').textContent = '编辑用户';
+          $('#user-modal').classList.remove('hidden');
+        }
+      } catch (err) {
+        alert('获取用户信息失败');
+      }
+    };
+
+    window.deleteUser = async (id) => {
+      if (id === currentUser.id) {
+        alert('不能删除自己');
+        return;
+      }
+      
+      if (confirm('确定要删除这个用户吗？')) {
+        try {
+          await supabase.delete(`users?id=eq.${id}`);
+          renderAdmin();
+          alert('用户已删除');
+        } catch (err) {
+          alert('删除失败');
+        }
+      }
+    };
+
+    const openUserModal = () => {
+      $('#edit-user-id').value = '';
+      $('#new-username').value = '';
+      $('#new-password').value = '';
+      $('#new-role').value = 'user';
+      $('#user-modal-title').textContent = '添加用户';
+      $('#user-modal').classList.remove('hidden');
+    };
+
+    const closeUserModal = () => {
+      $('#user-modal').classList.add('hidden');
+    };
+
+    const saveUser = async (e) => {
+      e.preventDefault();
+      
+      const id = $('#edit-user-id').value;
+      const username = $('#new-username').value;
+      const password = $('#new-password').value;
+      const role = $('#new-role').value;
+      
+      try {
+        if (id) {
+          // 编辑
+          const updateData = { username, role };
+          if (password) updateData.password = simpleHash(password);
+          await supabase.put('users', updateData, `?id=eq.${id}`);
+        } else {
+          // 新增
+          const newUser = {
+            id: generateId(),
+            username,
+            password: simpleHash(password),
+            role,
+            created_at: new Date().toISOString()
+          };
+          await supabase.post('users', newUser);
+        }
+        
+        closeUserModal();
+        renderAdmin();
+        alert('保存成功');
+      } catch (err) {
+        alert('保存失败: ' + err.message);
+      }
+    };
+
+    // 导出功能
     const exportCSV = () => {
       if (transactions.length === 0) { alert('暂无数据'); return; }
       const headers = ['日期', '类型', '类别', '金额', '备注'];
@@ -836,31 +1190,13 @@
       URL.revokeObjectURL(url);
     };
 
-    const clearAllData = () => {
-      if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
-        if (confirm('再次确认：所有数据将被永久删除！')) {
-          transactions = [];
-          budgets = { total: 0 };
-          localStorage.removeItem('transactions');
-          localStorage.removeItem('budgets');
-          renderCurrentPage();
-          alert('数据已清空');
-        }
-      }
-    };
-
-    // 初始化
-    const init = async () => {
-      // 加载本地数据
-      transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-      budgets = JSON.parse(localStorage.getItem('budgets') || '{"total": 0}');
-      
-      // 设置月份
+    // ==================== 初始化应用 ====================
+    const initApp = async () => {
       const currentMonth = getCurrentMonth();
       $('#dashboard-month').value = currentMonth;
       $('#transactions-month').value = currentMonth;
       
-      // 绑定事件
+      // 绑定导航事件
       $$('.nav-tab').forEach(tab => {
         tab.addEventListener('click', () => switchTab(tab.dataset.tab));
       });
@@ -890,9 +1226,20 @@
         });
       });
       
-      $('#btn-save-budget').addEventListener('click', () => {
+      $('#btn-save-budget').addEventListener('click', async () => {
         budgets.total = Number($('#budget-input').value) || 0;
         saveBudgets();
+        
+        // 同步到云端
+        try {
+          await supabase.post('budgets', {
+            id: generateId(),
+            user_id: currentUser.id,
+            total: budgets.total,
+            created_at: new Date().toISOString()
+          });
+        } catch (err) {}
+        
         renderBudget();
         alert('预算已保存');
       });
@@ -900,7 +1247,6 @@
       $('#btn-export-csv').addEventListener('click', exportCSV);
       $('#btn-export-json').addEventListener('click', exportJSON);
       $('#btn-export-html').addEventListener('click', exportExcel);
-      $('#btn-clear-data').addEventListener('click', clearAllData);
       
       $('#dashboard-month').addEventListener('change', renderDashboard);
       $('#transactions-month').addEventListener('change', renderTransactions);
@@ -909,7 +1255,30 @@
         if (e.target.id === 'modal') closeModal();
       });
       
-      // 网络状态监听
+      // 用户菜单
+      $('#user-btn').addEventListener('click', () => {
+        $('#user-dropdown').classList.toggle('show');
+      });
+      
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.user-menu')) {
+          $('#user-dropdown').classList.remove('show');
+        }
+      });
+      
+      $('#btn-logout').addEventListener('click', logout);
+      $('#btn-admin').addEventListener('click', () => switchTab('admin'));
+      
+      // 用户管理
+      $('#btn-add-user')?.addEventListener('click', openUserModal);
+      $('#btn-user-cancel').addEventListener('click', closeUserModal);
+      $('#user-form').addEventListener('submit', saveUser);
+      
+      $('#user-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'user-modal') closeUserModal();
+      });
+      
+      // 网络状态
       window.addEventListener('online', () => {
         isOnline = true;
         updateSyncStatus('syncing', '正在同步...');
@@ -921,12 +1290,91 @@
         updateSyncStatus('offline', '离线模式');
       });
       
-      // 从云端加载数据
+      // 加载数据
       await loadFromCloud();
       renderDashboard();
     };
 
-    document.addEventListener('DOMContentLoaded', init);
+    // ==================== 初始化 ====================
+    document.addEventListener('DOMContentLoaded', () => {
+      // 登录表单切换
+      $$('.login-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          $$('.login-tab').forEach(t => t.classList.remove('active'));
+          $$('.login-form').forEach(f => f.classList.remove('active'));
+          tab.classList.add('active');
+          $(`#${tab.dataset.tab}-form`).classList.add('active');
+        });
+      });
+      
+      // 登录
+      $('#login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = $('#login-btn');
+        btn.disabled = true;
+        btn.textContent = '登录中...';
+        
+        const result = await login($('#login-username').value, $('#login-password').value);
+        
+        if (result.success) {
+          $('#login-error').style.display = 'none';
+        } else {
+          $('#login-error').textContent = result.error;
+          $('#login-error').style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = '登录';
+        }
+      });
+      
+      // 注册
+      $('#register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = $('#register-btn');
+        const username = $('#reg-username').value;
+        const password = $('#reg-password').value;
+        const password2 = $('#reg-password2').value;
+        
+        if (password !== password2) {
+          $('#reg-error').textContent = '两次密码不一致';
+          $('#reg-error').style.display = 'block';
+          return;
+        }
+        
+        btn.disabled = true;
+        btn.textContent = '注册中...';
+        
+        const result = await register(username, password);
+        
+        if (result.success) {
+          $('#reg-error').style.display = 'none';
+          $('#reg-success').textContent = '注册成功！请登录';
+          $('#reg-success').style.display = 'block';
+          btn.textContent = '注册';
+          btn.disabled = false;
+          
+          // 切换到登录
+          setTimeout(() => {
+            $$('.login-tab').forEach(t => t.classList.remove('active'));
+            $$('.login-form').forEach(f => f.classList.remove('active'));
+            $('[data-tab="login"]').classList.add('active');
+            $('#login-form').classList.add('active');
+            $('#login-username').value = username;
+            $('#reg-success').style.display = 'none';
+          }, 1000);
+        } else {
+          $('#reg-error').textContent = result.error;
+          $('#reg-error').style.display = 'block';
+          $('#reg-success').style.display = 'none';
+          btn.textContent = '注册';
+          btn.disabled = false;
+        }
+      });
+      
+      // 检查登录状态
+      if (checkAuth()) {
+        showApp();
+      }
+    });
   </script>
 </body>
 </html>
