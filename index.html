@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>智慧记账系统 - 可视化财务管理</title>
+  <title>智慧记账系统</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -12,7 +12,6 @@
     body { font-family: "Microsoft YaHei", sans-serif; background: #f5f7fa; }
     .hidden { display: none !important; }
 
-    /* 登录页 */
     .auth-card { max-width: 420px; margin: 5rem auto; padding: 2rem; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
     .auth-title { font-size: 1.5rem; font-weight: bold; text-align: center; margin-bottom: 1.5rem; color: #333; }
     .form-control { width: 100%; padding: 0.8rem; border: 1px solid #e0e6ed; border-radius: 8px; margin-bottom: 1rem; font-size: 1rem; }
@@ -22,7 +21,6 @@
     .link { text-align: center; margin-top: 1rem; color: #4f46e5; cursor: pointer; }
     .err { color: red; font-size: 0.9rem; text-align: center; margin-top: 0.5rem; }
 
-    /* 主界面 */
     .navbar { background: #4f46e5; color: white; padding: 1rem; position: sticky; top: 0; z-index: 9; }
     .nav-top { display: flex; justify-content: space-between; align-items: center; }
     .nav-tabs { display: flex; gap: 0.6rem; margin-top: 0.8rem; flex-wrap: wrap; }
@@ -32,20 +30,17 @@
     .card { background: white; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.6rem; margin: 1rem 0; }
 
-    /* 分类图标样式 */
     .category-item { padding: 0.8rem; border-radius: 8px; text-align: center; border: 2px solid #f1f1f1; cursor: pointer; background: white; }
     .category-item.selected { border-color: #4f46e5; background: #eef2ff; }
     .category-item i { font-size: 1.2rem; margin-bottom: 0.3rem; }
     .income-color { color: #10b981; }
     .expense-color { color: #ef4444; }
 
-    /* 图表 */
     .chart-box { height: 260px; margin: 1rem 0; }
     .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1rem; }
     .stat-card { background: white; padding: 1rem; border-radius: 10px; text-align: center; }
     .stat-card .num { font-size: 1.2rem; font-weight: bold; margin-top: 0.3rem; }
 
-    /* 按钮 */
     .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.9rem; width: auto; }
     .btn-danger { background: #ef4444; color: white; }
     .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 99; }
@@ -56,7 +51,6 @@
 
 <body>
 
-<!-- 登录注册 -->
 <div id="auth">
   <div class="auth-card" id="loginCard">
     <div class="auth-title">登录</div>
@@ -77,7 +71,6 @@
   </div>
 </div>
 
-<!-- 主应用 -->
 <div id="app" class="hidden">
   <div class="navbar">
     <div class="nav-top">
@@ -97,7 +90,6 @@
   </div>
 
   <div class="container">
-    <!-- 概览 -->
     <section id="overview">
       <div class="stat-row">
         <div class="stat-card"><div>本月收入</div><div class="num income-color" id="totalIncome">0</div></div>
@@ -110,13 +102,11 @@
       </div>
     </section>
 
-    <!-- 记账 -->
     <section id="records" class="hidden">
       <button class="btn btn-primary btn-sm" onclick="openModal()">➕ 新增记账</button>
       <div class="card" style="margin-top:1rem"><div id="recordList"></div></div>
     </section>
 
-    <!-- 分类管理 -->
     <section id="category" class="hidden">
       <div class="card">
         <h4>分类管理</h4>
@@ -132,7 +122,6 @@
       </div>
     </section>
 
-    <!-- 图表 -->
     <section id="charts" class="hidden">
       <div class="card">
         <h4>支出构成（饼图）</h4>
@@ -144,7 +133,6 @@
       </div>
     </section>
 
-    <!-- 管理员 -->
     <section id="adminPage" class="hidden">
       <div class="card"><h4>用户审核</h4><div id="userList"></div></div>
     </section>
@@ -152,7 +140,6 @@
 
   <button class="fab" onclick="openModal()">➕</button>
 
-  <!-- 记账弹窗 -->
   <div class="hidden" id="modal">
     <div class="modal-body">
       <h3>新增记账</h3>
@@ -171,7 +158,6 @@
 </div>
 
 <script>
-// ============== 你的 Supabase 配置 ==============
 const sb = supabase.createClient(
   "https://nvqqfmvtyqzxxcgoeriv.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cXFmbXZ0eXF6eHhjZ29lcml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTAyODIsImV4cCI6MjA4OTg2NjI4Mn0.PoZYNU7ShemdTA_HCAK3Sp9t2OfswFI9ttmsVeE98T0"
@@ -182,7 +168,6 @@ let transType = "expense";
 let selectedCat = null;
 let pieChart, barChart;
 
-// 预置分类（带图标）
 const defaultCats = {
   income: [
     { name: "工资", icon: "bi-wallet2" },
@@ -203,7 +188,6 @@ const defaultCats = {
   ]
 };
 
-// ============== 页面切换 ==============
 document.querySelectorAll(".nav-tab").forEach(tab => {
   tab.onclick = () => {
     document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
@@ -215,7 +199,6 @@ document.querySelectorAll(".nav-tab").forEach(tab => {
   };
 });
 
-// ============== 登录注册 ==============
 function showReg() { document.getElementById("loginCard").classList.add("hidden"); document.getElementById("regCard").classList.remove("hidden"); }
 function showLogin() { document.getElementById("regCard").classList.add("hidden"); document.getElementById("loginCard").classList.remove("hidden"); }
 
@@ -248,7 +231,6 @@ async function login() {
 
 function logout() { location.reload(); }
 
-// ============== 初始化默认分类 ==============
 async function initDefaultCats() {
   const { data } = await sb.from("categories").select("*").eq("username", currentUser.username);
   if (data.length > 0) return;
@@ -258,7 +240,6 @@ async function initDefaultCats() {
   await sb.from("categories").insert(all);
 }
 
-// ============== 分类管理 ==============
 async function addCategory() {
   const name = document.getElementById("catName").value.trim();
   const type = document.getElementById("catType").value;
@@ -295,7 +276,6 @@ async function loadCategories() {
   refreshCatGrid();
 }
 
-// ============== 记账弹窗 ==============
 function setType(t) {
   transType = t;
   refreshCatGrid();
@@ -337,7 +317,6 @@ async function saveRecord() {
   loadAll();
 }
 
-// ============== 数据加载 ==============
 async function loadAll() {
   loadOverview();
   loadRecords();
@@ -373,7 +352,6 @@ async function loadRecords() {
   `).join("");
 }
 
-// ============== 图表 ==============
 async function renderCharts() {
   const { data } = await sb.from("transactions").select("*").eq("username", currentUser.username).eq("type", "expense");
   const map = {};
@@ -396,7 +374,6 @@ async function renderCharts() {
   });
 }
 
-// ============== 管理员 ==============
 async function loadAdmin() {
   const { data } = await sb.from("users").select("*");
   document.getElementById("userList").innerHTML = data.map(u => `
