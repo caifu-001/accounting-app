@@ -3,199 +3,182 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>云端记账助手</title>
+  <title>云端记账系统</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f3f4f6; min-height: 100vh; }
+    body { font-family: system-ui, sans-serif; background: #f4f5f7; }
     .hidden { display: none !important; }
 
-    .auth-wrapper { max-width: 420px; margin: 3rem auto; padding: 2rem; background: white; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .auth-box {
+      max-width: 400px; margin: 4rem auto; padding: 2rem;
+      background: white; border-radius: 1rem; box-shadow: 0 2px 10px #00000010;
+    }
     .auth-title { font-size: 1.5rem; font-weight: bold; text-align: center; margin-bottom: 1.5rem; }
     .form-group { margin-bottom: 1rem; }
-    .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-    .form-input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; }
-    .btn { padding: 0.75rem 1rem; border-radius: 0.5rem; border: none; cursor: pointer; font-weight: 500; transition: 0.2s; }
-    .btn-primary { width: 100%; background: #4f46e5; color: white; }
-    .btn-secondary { width: 100%; background: #e5e7eb; margin-top: 0.5rem; }
-    .btn-sm { padding: 0.25rem 0.75rem; font-size: 0.875rem; }
-    .error { color: #ef4444; text-align: center; margin-top: 0.5rem; font-size: 0.875rem; }
-    .link { color: #4f46e5; cursor: pointer; text-align: center; margin-top: 1rem; }
+    .form-label { display: block; margin-bottom: 0.5rem; }
+    .form-input {
+      width: 100%; padding: 0.8rem; border: 1px solid #ddd;
+      border-radius: 0.5rem; font-size: 1rem;
+    }
+    .btn {
+      width: 100%; padding: 0.8rem; border-radius: 0.5rem;
+      border: none; cursor: pointer; font-weight: bold; margin-top: 0.5rem;
+    }
+    .btn-primary { background: #4f46e5; color: white; }
+    .btn-secondary { background: #e5e7eb; color: #333; }
+    .text-center { text-align: center; margin-top: 1rem; }
+    .link { color: #4f46e5; cursor: pointer; }
+    .error { color: red; font-size: 0.9rem; text-align: center; margin-top: 0.5rem; }
 
-    .navbar { background: #4f46e5; color: white; padding: 1rem; position: sticky; top: 0; z-index: 100; }
-    .navbar-header { display: flex; justify-content: space-between; align-items: center; }
-    .nav-tabs { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
-    .nav-tab { padding: 0.5rem 1rem; border-radius: 0.5rem; background: transparent; color: white; border: none; cursor: pointer; }
-    .nav-tab.active { background: white; color: #4f46e5; font-weight: 500; }
+    .navbar { background: #4f46e5; color: white; padding: 1rem; position: sticky; top: 0; }
+    .nav-tabs { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+    .nav-tab { background: none; border: none; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
+    .nav-tab.active { background: white; color: #4f46e5; font-weight: bold; }
     .container { max-width: 1000px; margin: 0 auto; padding: 1rem; }
-    .card { background: white; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .card-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-    .stat-card { padding: 1.5rem; border-radius: 0.75rem; background: white; border-left: 4px solid; }
-    .stat-green { border-left-color: #10b981; }
-    .stat-red { border-left-color: #ef4444; }
-    .stat-blue { border-left-color: #3b82f6; }
-    .stat-label { color: #6b7280; font-size: 0.875rem; }
-    .stat-value { font-size: 1.5rem; font-weight: bold; margin-top: 0.25rem; }
-
-    .transaction-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem; }
-    .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
-    .category-btn { padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; background: white; cursor: pointer; text-align: center; }
+    .card { background: white; padding: 1.5rem; border-radius: 0.8rem; margin-bottom: 1rem; }
+    .transaction-item {
+      display: flex; justify-content: space-between;
+      padding: 1rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem;
+    }
+    .modal {
+      position: fixed; inset: 0; background: #0006;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-content { background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 450px; }
+    .fab {
+      position: fixed; right: 2rem; bottom: 2rem;
+      width: 3.5rem; height: 3.5rem; border-radius: 50%;
+      background: #4f46e5; color: white; font-size: 1.5rem; border: none;
+    }
+    .category-btn {
+      padding: 0.7rem; border: 2px solid #eee;
+      border-radius: 0.5rem; cursor: pointer; background: white;
+    }
     .category-btn.selected { border-color: #4f46e5; background: #eef2ff; }
-    .budget-bar { width: 100%; height: 1rem; background: #e5e7eb; border-radius: 0.5rem; overflow: hidden; margin-top: 1rem; }
-    .budget-fill { height: 100%; background: #10b981; transition: width 0.3s; }
-    .fab { position: fixed; bottom: 2rem; right: 2rem; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: #4f46e5; color: white; font-size: 1.5rem; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
-    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-    .modal-content { background: white; border-radius: 1rem; padding: 2rem; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
-    .flex { display: flex; gap: 0.75rem; align-items: center; }
-    .text-sm { font-size: 0.875rem; }
-    .text-green { color: #10b981; }
-    .text-red { color: #ef4444; }
-    .mt-4 { margin-top: 1rem; }
-    .mb-4 { margin-bottom: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; margin: 1rem 0; }
+    .stats { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .stat { flex:1; background: white; padding: 1rem; border-radius: 0.8rem; min-width: 180px; }
   </style>
 </head>
 <body>
 
+<!-- 登录 -->
 <div id="auth-page">
-  <div class="auth-wrapper" id="login-box">
+  <div class="auth-box" id="login-form">
     <div class="auth-title">登录</div>
     <div class="form-group">
       <label class="form-label">用户名</label>
-      <input class="form-input" id="login-user">
+      <input class="form-input" id="login_user">
     </div>
     <div class="form-group">
       <label class="form-label">密码</label>
-      <input type="password" class="form-input" id="login-pwd">
+      <input type="password" class="form-input" id="login_pwd">
     </div>
-    <button class="btn btn-primary" onclick="login()">登录</button>
-    <div class="link" onclick="showRegister()">没有账号？去注册</div>
-    <div class="error" id="login-error"></div>
+    <button class="btn btn-primary" onclick="doLogin()">登录</button>
+    <div class="text-center">
+      <span class="link" onclick="showReg()">去注册</span>
+    </div>
+    <div class="error" id="login_err"></div>
   </div>
 
-  <div class="auth-wrapper hidden" id="register-box">
+  <div class="auth-box hidden" id="reg-form">
     <div class="auth-title">注册</div>
     <div class="form-group">
       <label class="form-label">用户名</label>
-      <input class="form-input" id="reg-user">
+      <input class="form-input" id="reg_user">
     </div>
     <div class="form-group">
       <label class="form-label">密码</label>
-      <input type="password" class="form-input" id="reg-pwd">
+      <input type="password" class="form-input" id="reg_pwd">
     </div>
-    <button class="btn btn-primary" onclick="register()">注册</button>
+    <button class="btn btn-primary" onclick="doRegister()">注册</button>
     <button class="btn btn-secondary" onclick="showLogin()">返回登录</button>
-    <div class="error" id="reg-error"></div>
+    <div class="error" id="reg_err"></div>
   </div>
 </div>
 
+<!-- 主界面 -->
 <div id="app" class="hidden">
   <div class="navbar">
-    <div class="navbar-header">
-      <h1>💰 云端记账助手</h1>
+    <div style="display:flex;justify-content:space-between">
+      <h3>💰 云端记账系统</h3>
       <div>
-        <span id="user-name"></span>
-        <button class="btn btn-sm" onclick="logout()">退出</button>
+        <span id="nickname"></span>
+        <button onclick="logout()" style="background:none;border:none;color:white;margin-left:0.5rem">退出</button>
       </div>
     </div>
     <div class="nav-tabs">
-      <button class="nav-tab active" data-page="dashboard">概览</button>
-      <button class="nav-tab" data-page="transactions">记账</button>
-      <button class="nav-tab" data-page="categories">分类管理</button>
-      <button class="nav-tab" data-page="budget">预算</button>
-      <button class="nav-tab" data-page="export">导出</button>
-      <button class="nav-tab hidden" id="admin-tab" data-page="admin">用户审核</button>
+      <button class="nav-tab active" data-page="overview">概览</button>
+      <button class="nav-tab" data-page="records">记账记录</button>
+      <button class="nav-tab" data-page="category">分类管理</button>
+      <button class="nav-tab" data-page="admin" id="admin_tab">用户审核</button>
     </div>
   </div>
 
   <div class="container">
-    <section id="dashboard" class="page">
-      <div class="stats-grid">
-        <div class="stat-card stat-green">
-          <div class="stat-label">本月收入</div>
-          <div class="stat-value" id="income-total">¥0.00</div>
-        </div>
-        <div class="stat-card stat-red">
-          <div class="stat-label">本月支出</div>
-          <div class="stat-value" id="expense-total">¥0.00</div>
-        </div>
-        <div class="stat-card stat-blue">
-          <div class="stat-label">本月结余</div>
-          <div class="stat-value" id="balance-total">¥0.00</div>
-        </div>
+    <section id="overview">
+      <div class="stats">
+        <div class="stat">收入：<span id="income">0</span></div>
+        <div class="stat">支出：<span id="expense">0</span></div>
+        <div class="stat">结余：<span id="balance">0</span></div>
       </div>
       <div class="card">
-        <div class="card-title">最近交易</div>
-        <div id="recent-list"></div>
+        <h4>最近记录</h4>
+        <div id="recent_list"></div>
       </div>
     </section>
 
-    <section id="transactions" class="page hidden">
-      <button class="btn btn-primary mb-4" onclick="openModal()">添加记录</button>
-      <div id="trans-list"></div>
+    <section id="records" class="hidden">
+      <button class="btn btn-primary" style="width:auto" onclick="openModal()">添加记录</button>
+      <div id="record_list" style="margin-top:1rem"></div>
     </section>
 
-    <section id="categories" class="page hidden">
+    <section id="category" class="hidden">
       <div class="card">
-        <div class="card-title">自定义分类</div>
-        <div class="flex mb-4">
-          <input class="form-input" id="new-cat-name" placeholder="分类名称">
-          <select id="new-cat-type" class="form-input">
+        <h4>自定义分类</h4>
+        <div style="display:flex;gap:0.5rem;margin:1rem 0">
+          <input class="form-input" id="cat_name" placeholder="分类名">
+          <select id="cat_type" class="form-input">
             <option value="income">收入</option>
             <option value="expense">支出</option>
           </select>
-          <button class="btn btn-primary" onclick="addCategory()">添加</button>
+          <button class="btn btn-primary" style="width:auto" onclick="addCategory()">添加</button>
         </div>
-        <div id="cat-list"></div>
+        <div id="cat_list"></div>
       </div>
     </section>
 
-    <section id="budget" class="page hidden">
+    <section id="admin" class="hidden">
       <div class="card">
-        <div class="card-title">月度预算</div>
-        <input type="number" id="budget-input" class="form-input mb-4" placeholder="输入预算金额">
-        <button class="btn btn-primary" onclick="saveBudget()">保存预算</button>
-        <div class="budget-bar mt-4"><div class="budget-fill" id="budget-fill"></div></div>
-        <div class="mt-4 text-sm" id="budget-text"></div>
-      </div>
-    </section>
-
-    <section id="export" class="page hidden">
-      <div class="card">
-        <button class="btn btn-primary" onclick="exportCSV()">导出 CSV</button>
-        <button class="btn btn-secondary mt-4" onclick="exportJSON()">导出 JSON</button>
-      </div>
-    </section>
-
-    <section id="admin" class="page hidden">
-      <div class="card">
-        <div class="card-title">用户审核</div>
-        <div id="admin-user-list"></div>
+        <h4>用户审核</h4>
+        <div id="user_list"></div>
       </div>
     </section>
   </div>
 
   <button class="fab" onclick="openModal()">+</button>
 
-  <div class="modal hidden" id="modal">
+  <div class="hidden" id="modal">
     <div class="modal-content">
-      <h3 class="mb-4">添加记录</h3>
-      <div class="flex gap-2 mb-4">
-        <button class="btn" id="t-expense" onclick="setType('expense')">支出</button>
-        <button class="btn" id="t-income" onclick="setType('income')">收入</button>
+      <h3>添加记录</h3>
+      <div style="display:flex;gap:0.5rem;margin:1rem 0">
+        <button class="btn" onclick="setTransType('expense')">支出</button>
+        <button class="btn" onclick="setTransType('income')">收入</button>
       </div>
-      <input type="number" class="form-input mb-4" id="amount" placeholder="金额" required>
-      <div class="category-grid mb-4" id="cat-grid"></div>
-      <input type="date" class="form-input mb-4" id="date">
-      <input type="text" class="form-input mb-4" id="note" placeholder="备注">
-      <button class="btn btn-primary" onclick="saveTransaction()">保存</button>
-      <button class="btn btn-secondary mt-4" onclick="closeModal()">取消</button>
+      <input class="form-input" type="number" placeholder="金额" id="amount">
+      <div class="grid" id="cat_grid"></div>
+      <input class="form-input" type="date" id="trans_date">
+      <input class="form-input" placeholder="备注" id="note">
+      <button class="btn btn-primary" onclick="saveTrans()">保存</button>
+      <button class="btn btn-secondary" onclick="closeModal()">取消</button>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const supabase = supabase.createClient(
+// 关键修复：变量名不冲突，正常初始化
+const sb = supabase.createClient(
   "https://nvqqfmvtyqzxxcgoeriv.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cXFmbXZ0eXF6eHhjZ29lcml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTAyODIsImV4cCI6MjA4OTg2NjI4Mn0.PoZYNU7ShemdTA_HCAK3Sp9t2OfswFI9ttmsVeE98T0"
 );
@@ -204,195 +187,193 @@ let currentUser = null;
 let transType = "expense";
 let selectedCat = null;
 
-document.querySelectorAll(".nav-tab").forEach(tab => {
+// 页面切换
+document.querySelectorAll('.nav-tab').forEach(tab => {
   tab.onclick = () => {
-    document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-    document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
-    document.getElementById(tab.dataset.page).classList.remove("hidden");
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('#overview, #records, #category, #admin').forEach(s => s.classList.add('hidden'));
+    document.getElementById(tab.dataset.page).classList.remove('hidden');
   };
 });
 
-function showRegister() {
-  document.getElementById("login-box").classList.add("hidden");
-  document.getElementById("register-box").classList.remove("hidden");
+function showReg() {
+  document.getElementById('login-form').classList.add('hidden');
+  document.getElementById('reg-form').classList.remove('hidden');
 }
 function showLogin() {
-  document.getElementById("register-box").classList.add("hidden");
-  document.getElementById("login-box").classList.remove("hidden");
+  document.getElementById('reg-form').classList.add('hidden');
+  document.getElementById('login-form').classList.remove('hidden');
 }
 
-async function register() {
-  const user = document.getElementById("reg-user").value.trim();
-  const pwd = document.getElementById("reg-pwd").value.trim();
-  if (!user || !pwd) { document.getElementById("reg-error").innerText = "请填写完整"; return; }
-  const { data } = await supabase.from("users").select("*").eq("username", user);
-  if (data.length > 0) { document.getElementById("reg-error").innerText = "用户已存在"; return; }
-  await supabase.from("users").insert([{ username: user, password: pwd, role: "user", status: "pending" }]);
-  alert("注册成功，请等待管理员审核");
+// 注册
+async function doRegister() {
+  const username = document.getElementById('reg_user').value.trim();
+  const password = document.getElementById('reg_pwd').value.trim();
+  const err = document.getElementById('reg_err');
+  if (!username || !password) { err.textContent = '请填写完整'; return; }
+
+  const { data: exists } = await sb.from('users').select('*').eq('username', username);
+  if (exists.length > 0) { err.textContent = '用户已存在'; return; }
+
+  await sb.from('users').insert([{ username, password, role: 'user', status: 'pending' }]);
+  alert('注册成功，请等待管理员审核');
   showLogin();
 }
 
-async function login() {
-  const user = document.getElementById("login-user").value.trim();
-  const pwd = document.getElementById("login-pwd").value.trim();
-  console.log("尝试登录:", user, pwd);
-  const { data, error } = await supabase.from("users").select("*").eq("username", user).eq("password", pwd);
-  console.log("登录返回:", data, error);
-  if (error) { document.getElementById("login-error").innerText = error.message; return; }
-  if (data.length === 0) { document.getElementById("login-error").innerText = "账号或密码错误"; return; }
-  const u = data[0];
-  if (u.status !== "approved") { document.getElementById("login-error").innerText = "账号未审核"; return; }
-  currentUser = u;
-  document.getElementById("auth-page").classList.add("hidden");
-  document.getElementById("app").classList.remove("hidden");
-  document.getElementById("user-name").innerText = "欢迎，" + u.username;
-  if (u.role === "admin") document.getElementById("admin-tab").classList.remove("hidden");
-  loadAllData();
+// 登录
+async function doLogin() {
+  const username = document.getElementById('login_user').value.trim();
+  const password = document.getElementById('login_pwd').value.trim();
+  const err = document.getElementById('login_err');
+  if (!username || !password) { err.textContent = '请输入账号密码'; return; }
+
+  const { data, error } = await sb.from('users')
+    .select('*')
+    .eq('username', username)
+    .eq('password', password);
+
+  if (error || data.length === 0) { err.textContent = '账号或密码错误'; return; }
+
+  const user = data[0];
+  if (user.status !== 'approved') { err.textContent = '账号未审核'; return; }
+
+  currentUser = user;
+  document.getElementById('auth-page').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('nickname').textContent = currentUser.username;
+
+  if (user.role === 'admin') {
+    document.getElementById('admin_tab').classList.remove('hidden');
+  }
+
+  loadAll();
 }
 
 function logout() {
   currentUser = null;
-  document.getElementById("auth-page").classList.remove("hidden");
-  document.getElementById("app").classList.add("hidden");
-  document.getElementById("admin-tab").classList.add("hidden");
+  document.getElementById('auth-page').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('admin_tab').classList.add('hidden');
 }
 
+// 管理员审核
 async function loadAdmin() {
-  const { data } = await supabase.from("users").select("*");
-  document.getElementById("admin-user-list").innerHTML = data.map(u => `
+  const { data } = await sb.from('users').select('*');
+  const html = data.map(u => `
     <div class="transaction-item">
-      <span>${u.username} | ${u.role} | ${u.status}</span>
-      ${u.status === "pending" ? `<button class="btn btn-sm btn-primary" onclick="approve('${u.username}')">通过</button>` : ""}
+      <span>${u.username} (${u.role}) ${u.status}</span>
+      ${u.status === 'pending' ? `<button onclick="approve('${u.username}')">通过</button>` : ''}
     </div>
-  `).join("");
+  `).join('');
+  document.getElementById('user_list').innerHTML = html;
 }
 
 async function approve(username) {
-  await supabase.from("users").update({ status: "approved" }).eq("username", username);
+  await sb.from('users').update({ status: 'approved' }).eq('username', username);
   loadAdmin();
 }
 
+// 分类
 async function addCategory() {
-  const name = document.getElementById("new-cat-name").value.trim();
-  const type = document.getElementById("new-cat-type").value;
+  const name = document.getElementById('cat_name').value.trim();
+  const type = document.getElementById('cat_type').value;
   if (!name) return;
-  await supabase.from("categories").insert([{ username: currentUser.username, type, name }]);
-  loadCategories();
+  await sb.from('categories').insert([{ username: currentUser.username, type, name }]);
+  loadCategory();
 }
 
-async function loadCategories() {
-  const { data } = await supabase.from("categories").select("*").eq("username", currentUser.username);
-  const income = data.filter(c => c.type === "income");
-  const expense = data.filter(c => c.type === "expense");
-  document.getElementById("cat-list").innerHTML = `
-    <div><strong>收入分类</strong></div>
-    ${income.map(c => `<div class="transaction-item">${c.name}</div>`).join("")}
-    <div class="mt-4"><strong>支出分类</strong></div>
-    ${expense.map(c => `<div class="transaction-item">${c.name}</div>`).join("")}
+async function loadCategory() {
+  const { data } = await sb.from('categories').select('*').eq('username', currentUser.username);
+  const income = data.filter(c => c.type === 'income');
+  const expense = data.filter(c => c.type === 'expense');
+  document.getElementById('cat_list').innerHTML = `
+    <div>收入分类：${income.map(i=>i.name).join('、')}</div>
+    <div>支出分类：${expense.map(i=>i.name).join('、')}</div>
   `;
-  renderCatGrid();
+  refreshCatGrid();
 }
 
-function setType(t) {
+function setTransType(t) {
   transType = t;
-  renderCatGrid();
+  refreshCatGrid();
 }
 
-async function renderCatGrid() {
-  const { data } = await supabase.from("categories").select("*").eq("username", currentUser.username).eq("type", transType);
-  document.getElementById("cat-grid").innerHTML = data.map(c => `
-    <button class="category-btn" onclick="selCat(this, '${c.name}')">${c.name}</button>
-  `).join("");
+async function refreshCatGrid() {
+  const { data } = await sb.from('categories').select('*')
+    .eq('username', currentUser.username)
+    .eq('type', transType);
+  document.getElementById('cat_grid').innerHTML = data.map(c => `
+    <button class="category-btn" onclick="selectCat(this,'${c.name}')">${c.name}</button>
+  `).join('');
 }
 
-function selCat(el, name) {
-  document.querySelectorAll(".category-btn").forEach(b => b.classList.remove("selected"));
-  el.classList.add("selected");
+function selectCat(el, name) {
+  document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
   selectedCat = name;
 }
 
+// 记账
 function openModal() {
-  document.getElementById("modal").classList.remove("hidden");
-  document.getElementById("date").value = new Date().toISOString().split("T")[0];
-  renderCatGrid();
+  document.getElementById('modal').classList.remove('hidden');
+  document.getElementById('trans_date').valueAsDate = new Date();
+  refreshCatGrid();
 }
-function closeModal() { document.getElementById("modal").classList.add("hidden"); }
+function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
-async function saveTransaction() {
-  const amount = Number(document.getElementById("amount").value);
-  const date = document.getElementById("date").value;
-  const note = document.getElementById("note").value;
+async function saveTrans() {
+  const amount = Number(document.getElementById('amount').value);
+  const date = document.getElementById('trans_date').value;
+  const note = document.getElementById('note').value;
   if (!amount || !selectedCat) return;
-  await supabase.from("transactions").insert([{
-    username: currentUser.username, type: transType, amount, date, note, category: selectedCat
+
+  await sb.from('transactions').insert([{
+    username: currentUser.username,
+    type: transType,
+    amount,
+    date,
+    note,
+    category: selectedCat
   }]);
   closeModal();
-  loadAllData();
+  loadAll();
 }
 
-async function loadAllData() {
-  await loadTransactions();
-  await loadCategories();
-  await loadBudget();
-  if (currentUser?.role === "admin") await loadAdmin();
+// 数据加载
+async function loadAll() {
+  loadOverview();
+  loadRecords();
+  loadCategory();
+  if (currentUser.role === 'admin') loadAdmin();
 }
 
-async function loadTransactions() {
-  const { data } = await supabase.from("transactions").select("*").eq("username", currentUser.username);
-  const income = data.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-  const expense = data.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
-  document.getElementById("income-total").innerText = "¥" + income.toFixed(2);
-  document.getElementById("expense-total").innerText = "¥" + expense.toFixed(2);
-  document.getElementById("balance-total").innerText = "¥" + (income - expense).toFixed(2);
+async function loadOverview() {
+  const { data } = await sb.from('transactions').select('*').eq('username', currentUser.username);
+  const income = data.filter(t=>t.type==='income').reduce((s,i)=>s+i.amount,0);
+  const expense = data.filter(t=>t.type==='expense').reduce((s,i)=>s+i.amount,0);
+  document.getElementById('income').textContent = income;
+  document.getElementById('expense').textContent = expense;
+  document.getElementById('balance').textContent = income - expense;
 
-  document.getElementById("trans-list").innerHTML = data.reverse().map(t => `
+  const recent = data.slice(-5).reverse();
+  document.getElementById('recent_list').innerHTML = recent.map(t => `
     <div class="transaction-item">
       <span>${t.date} ${t.category}</span>
-      <span>${t.note || ""}</span>
-      <span class="${t.type === 'income' ? 'text-green' : 'text-red'}">¥${t.amount}</span>
+      <span>${t.type === 'income' ? '+' : '-' }${t.amount}</span>
     </div>
-  `).join("");
+  `).join('');
+}
 
-  document.getElementById("recent-list").innerHTML = data.slice(-5).reverse().map(t => `
+async function loadRecords() {
+  const { data } = await sb.from('transactions').select('*').eq('username', currentUser.username);
+  document.getElementById('record_list').innerHTML = data.reverse().map(t => `
     <div class="transaction-item">
       <span>${t.date} ${t.category}</span>
-      <span class="${t.type === 'income' ? 'text-green' : 'text-red'}">¥${t.amount}</span>
+      <span>${t.note || ''}</span>
+      <span>${t.type === 'income' ? '+' : '-' }${t.amount}</span>
     </div>
-  `).join("");
-}
-
-async function saveBudget() {
-  const val = Number(document.getElementById("budget-input").value);
-  await supabase.from("budget").upsert([{ username: currentUser.username, amount: val }]);
-  loadBudget();
-}
-
-async function loadBudget() {
-  const { data } = await supabase.from("budget").select("*").eq("username", currentUser.username);
-  const budget = data[0]?.amount || 0;
-  const { data: tData } = await supabase.from("transactions").select("*").eq("username", currentUser.username).eq("type", "expense");
-  const used = tData.reduce((s, t) => s + t.amount, 0);
-  const pct = Math.min(100, (used / budget) * 100) || 0;
-  document.getElementById("budget-fill").style.width = pct + "%";
-  document.getElementById("budget-text").innerText = `已使用：¥${used} / 预算：¥${budget}`;
-}
-
-async function exportCSV() {
-  const { data } = await supabase.from("transactions").select("*").eq("username", currentUser.username);
-  const csv = "日期,类型,分类,金额,备注\n" + data.map(t => `${t.date},${t.type},${t.category},${t.amount},${t.note}`).join("\n");
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-  a.download = "记账数据.csv";
-  a.click();
-}
-
-async function exportJSON() {
-  const { data } = await supabase.from("transactions").select("*").eq("username", currentUser.username);
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
-  a.download = "记账数据.json";
-  a.click();
+  `).join('');
 }
 </script>
 </body>
