@@ -510,8 +510,19 @@
         localStorage.setItem('transactions', JSON.stringify(transactions));
         closeModal();
         renderCurrentPage();
+        alert('保存成功');
       } catch (err) {
-        alert('保存失败');
+        // 即使 API 报错，数据已保存到本地
+        if (editingId) {
+          transactions = transactions.map(t => t.id === editingId ? { ...tx, id: editingId } : t);
+        } else {
+          tx.id = generateId();
+          transactions.unshift(tx);
+        }
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+        closeModal();
+        renderCurrentPage();
+        alert('已保存到本地');
       }
     };
 
@@ -523,7 +534,10 @@
         localStorage.setItem('transactions', JSON.stringify(transactions));
         renderCurrentPage();
       } catch (err) {
-        alert('删除失败');
+        // API 失败也从本地删除
+        transactions = transactions.filter(t => t.id !== id);
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+        renderCurrentPage();
       }
     };
 
@@ -631,27 +645,64 @@
       if (currentUser?.role !== 'admin') return;
       try {
         const users = await api.get('users', '?order=created_at.desc');
-        $('#users-list').innerHTML = users && users.length > 0
+        const allTx = await api.get('transactions', '?order=date.desc');
+        
+        // 生成用户列表
+        const usersHtml = users && users.length > 0
           ? `
             <table class="table">
-              <thead><tr><th>用户名</th><th>角色</th><th>操作</th></tr></thead>
+              <thead><tr><th>用户名</th><th>角色</th><th>记账数</th><th>操作</th></tr></thead>
               <tbody>
-                ${users.map(u => `
-                  <tr>
-                    <td>${u.username}</td>
-                    <td><span class="badge ${u.role === 'admin' ? 'badge-admin' : 'badge-user'}">${u.role === 'admin' ? '管理员' : '用户'}</span></td>
-                    <td>
-                      <button class="btn btn-sm" onclick="editUser('${u.id}')">编辑</button>
-                      <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" ${u.id === currentUser.id ? 'disabled' : ''}>删除</button>
-                    </td>
-                  </tr>
-                `).join('')}
+                ${users.map(u => {
+                  const userTxCount = allTx ? allTx.filter(t => t.user_id === u.id).length : 0;
+                  return `
+                    <tr>
+                      <td>${u.username}</td>
+                      <td><span class="badge ${u.role === 'admin' ? 'badge-admin' : 'badge-user'}">${u.role === 'admin' ? '管理员' : '用户'}</span></td>
+                      <td>${userTxCount} 条</td>
+                      <td>
+                        <button class="btn btn-sm" onclick="editUser('${u.id}')">编辑</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" ${u.id === currentUser.id ? 'disabled' : ''}>删除</button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
               </tbody>
             </table>
           `
           : '<p class="empty-state">暂无用户</p>';
+        
+        // 生成所有交易概览
+        const txHtml = allTx && allTx.length > 0
+          ? `
+            <div style="margin-top: 1.5rem;">
+              <h4 style="margin-bottom: 1rem;">所有用户记账（最近20条）</h4>
+              <table class="table">
+                <thead><tr><th>日期</th><th>用户</th><th>类别</th><th>类型</th><th>金额</th></tr></thead>
+                <tbody>
+                  ${allTx.slice(0, 20).map(t => {
+                    const user = users?.find(u => u.id === t.user_id);
+                    const cat = CATEGORIES[t.type]?.find(c => c.id === t.category);
+                    return `
+                      <tr>
+                        <td>${formatDate(t.date)}</td>
+                        <td>${user?.username || '未知'}</td>
+                        <td>${cat?.icon || ''} ${cat?.name || t.category}</td>
+                        <td class="transaction-amount ${t.type}">${t.type === 'income' ? '收入' : '支出'}</td>
+                        <td class="transaction-amount ${t.type}">${formatCurrency(t.amount)}</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+              <p style="margin-top: 0.5rem; color: #6b7280; font-size: 0.875rem;">共 ${allTx.length} 条记录</p>
+            </div>
+          `
+          : '<p class="empty-state">暂无记账记录</p>';
+        
+        $('#users-list').innerHTML = usersHtml + txHtml;
       } catch (err) {
-        $('#users-list').innerHTML = '<p class="empty-state">加载失败</p>';
+        $('#users-list').innerHTML = '<p class="empty-state">加载失败: ' + err.message + '</p>';
       }
     };
 
@@ -756,7 +807,7 @@
         renderAdmin();
         alert('保存成功');
       } catch (err) {
-        alert('保存失败');
+        alert('保存失败: ' + err.message);
       }
     };
 
@@ -848,9 +899,11 @@
           } else {
             await api.post('budgets', { id: generateId(), user_id: currentUser.id, total: budgets.total });
           }
-        } catch (err) {}
+          alert('保存成功');
+        } catch (err) {
+          alert('已保存到本地');
+        }
         renderBudget();
-        alert('保存成功');
       };
       
       $('#btn-export-csv').onclick = () => exportData('csv');
