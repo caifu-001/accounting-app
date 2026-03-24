@@ -3,181 +3,175 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>云端记账系统</title>
+  <title>智慧记账系统 - 可视化财务管理</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: system-ui, sans-serif; background: #f4f5f7; }
+    body { font-family: "Microsoft YaHei", sans-serif; background: #f5f7fa; }
     .hidden { display: none !important; }
 
-    .auth-box {
-      max-width: 400px; margin: 4rem auto; padding: 2rem;
-      background: white; border-radius: 1rem; box-shadow: 0 2px 10px #00000010;
-    }
-    .auth-title { font-size: 1.5rem; font-weight: bold; text-align: center; margin-bottom: 1.5rem; }
-    .form-group { margin-bottom: 1rem; }
-    .form-label { display: block; margin-bottom: 0.5rem; }
-    .form-input {
-      width: 100%; padding: 0.8rem; border: 1px solid #ddd;
-      border-radius: 0.5rem; font-size: 1rem;
-    }
-    .btn {
-      width: 100%; padding: 0.8rem; border-radius: 0.5rem;
-      border: none; cursor: pointer; font-weight: bold; margin-top: 0.5rem;
-    }
+    /* 登录页 */
+    .auth-card { max-width: 420px; margin: 5rem auto; padding: 2rem; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .auth-title { font-size: 1.5rem; font-weight: bold; text-align: center; margin-bottom: 1.5rem; color: #333; }
+    .form-control { width: 100%; padding: 0.8rem; border: 1px solid #e0e6ed; border-radius: 8px; margin-bottom: 1rem; font-size: 1rem; }
+    .btn { width: 100%; padding: 0.9rem; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
     .btn-primary { background: #4f46e5; color: white; }
-    .btn-secondary { background: #e5e7eb; color: #333; }
-    .text-center { text-align: center; margin-top: 1rem; }
-    .link { color: #4f46e5; cursor: pointer; }
-    .error { color: red; font-size: 0.9rem; text-align: center; margin-top: 0.5rem; }
+    .btn-secondary { background: #f1f3f6; color: #333; margin-top: 0.5rem; }
+    .link { text-align: center; margin-top: 1rem; color: #4f46e5; cursor: pointer; }
+    .err { color: red; font-size: 0.9rem; text-align: center; margin-top: 0.5rem; }
 
-    .navbar { background: #4f46e5; color: white; padding: 1rem; position: sticky; top: 0; }
-    .nav-tabs { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
-    .nav-tab { background: none; border: none; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; }
+    /* 主界面 */
+    .navbar { background: #4f46e5; color: white; padding: 1rem; position: sticky; top: 0; z-index: 9; }
+    .nav-top { display: flex; justify-content: space-between; align-items: center; }
+    .nav-tabs { display: flex; gap: 0.6rem; margin-top: 0.8rem; flex-wrap: wrap; }
+    .nav-tab { background: rgba(255,255,255,0.15); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
     .nav-tab.active { background: white; color: #4f46e5; font-weight: bold; }
     .container { max-width: 1000px; margin: 0 auto; padding: 1rem; }
-    .card { background: white; padding: 1.5rem; border-radius: 0.8rem; margin-bottom: 1rem; }
-    .transaction-item {
-      display: flex; justify-content: space-between;
-      padding: 1rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem;
-    }
-    .modal {
-      position: fixed; inset: 0; background: #0006;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .modal-content { background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 450px; }
-    .fab {
-      position: fixed; right: 2rem; bottom: 2rem;
-      width: 3.5rem; height: 3.5rem; border-radius: 50%;
-      background: #4f46e5; color: white; font-size: 1.5rem; border: none;
-    }
-    .category-btn {
-      padding: 0.7rem; border: 2px solid #eee;
-      border-radius: 0.5rem; cursor: pointer; background: white;
-    }
-    .category-btn.selected { border-color: #4f46e5; background: #eef2ff; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; margin: 1rem 0; }
-    .stats { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .stat { flex:1; background: white; padding: 1rem; border-radius: 0.8rem; min-width: 180px; }
+    .card { background: white; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.6rem; margin: 1rem 0; }
+
+    /* 分类图标样式 */
+    .category-item { padding: 0.8rem; border-radius: 8px; text-align: center; border: 2px solid #f1f1f1; cursor: pointer; background: white; }
+    .category-item.selected { border-color: #4f46e5; background: #eef2ff; }
+    .category-item i { font-size: 1.2rem; margin-bottom: 0.3rem; }
+    .income-color { color: #10b981; }
+    .expense-color { color: #ef4444; }
+
+    /* 图表 */
+    .chart-box { height: 260px; margin: 1rem 0; }
+    .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1rem; }
+    .stat-card { background: white; padding: 1rem; border-radius: 10px; text-align: center; }
+    .stat-card .num { font-size: 1.2rem; font-weight: bold; margin-top: 0.3rem; }
+
+    /* 按钮 */
+    .btn-sm { padding: 0.5rem 0.8rem; font-size: 0.9rem; width: auto; }
+    .btn-danger { background: #ef4444; color: white; }
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 99; }
+    .modal-body { background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 450px; }
+    .fab { position: fixed; right: 2rem; bottom: 2rem; width: 3.5rem; height: 3.5rem; border-radius: 50%; background: #4f46e5; color: white; font-size: 1.4rem; border: none; }
   </style>
 </head>
+
 <body>
 
-<!-- 登录 -->
-<div id="auth-page">
-  <div class="auth-box" id="login-form">
+<!-- 登录注册 -->
+<div id="auth">
+  <div class="auth-card" id="loginCard">
     <div class="auth-title">登录</div>
-    <div class="form-group">
-      <label class="form-label">用户名</label>
-      <input class="form-input" id="login_user">
-    </div>
-    <div class="form-group">
-      <label class="form-label">密码</label>
-      <input type="password" class="form-input" id="login_pwd">
-    </div>
-    <button class="btn btn-primary" onclick="doLogin()">登录</button>
-    <div class="text-center">
-      <span class="link" onclick="showReg()">去注册</span>
-    </div>
-    <div class="error" id="login_err"></div>
+    <input class="form-control" id="loginUser" placeholder="用户名">
+    <input type="password" class="form-control" id="loginPwd" placeholder="密码">
+    <button class="btn btn-primary" onclick="login()">登录</button>
+    <div class="link" onclick="showReg()">没有账号？立即注册</div>
+    <div class="err" id="loginErr"></div>
   </div>
 
-  <div class="auth-box hidden" id="reg-form">
+  <div class="auth-card hidden" id="regCard">
     <div class="auth-title">注册</div>
-    <div class="form-group">
-      <label class="form-label">用户名</label>
-      <input class="form-input" id="reg_user">
-    </div>
-    <div class="form-group">
-      <label class="form-label">密码</label>
-      <input type="password" class="form-input" id="reg_pwd">
-    </div>
-    <button class="btn btn-primary" onclick="doRegister()">注册</button>
+    <input class="form-control" id="regUser" placeholder="用户名">
+    <input type="password" class="form-control" id="regPwd" placeholder="密码">
+    <button class="btn btn-primary" onclick="register()">注册</button>
     <button class="btn btn-secondary" onclick="showLogin()">返回登录</button>
-    <div class="error" id="reg_err"></div>
+    <div class="err" id="regErr"></div>
   </div>
 </div>
 
-<!-- 主界面 -->
+<!-- 主应用 -->
 <div id="app" class="hidden">
   <div class="navbar">
-    <div style="display:flex;justify-content:space-between">
-      <h3>💰 云端记账系统</h3>
+    <div class="nav-top">
+      <h3>💰 智慧记账系统</h3>
       <div>
-        <span id="nickname"></span>
+        <span id="userName"></span>
         <button onclick="logout()" style="background:none;border:none;color:white;margin-left:0.5rem">退出</button>
       </div>
     </div>
     <div class="nav-tabs">
-      <button class="nav-tab active" data-page="overview">概览</button>
-      <button class="nav-tab" data-page="records">记账记录</button>
-      <button class="nav-tab" data-page="category">分类管理</button>
-      <button class="nav-tab" data-page="admin" id="admin_tab">用户审核</button>
+      <button class="nav-tab active" data-page="overview">📊 概览</button>
+      <button class="nav-tab" data-page="records">📝 记账</button>
+      <button class="nav-tab" data-page="category">🗂️ 分类管理</button>
+      <button class="nav-tab" data-page="charts">📈 数据图表</button>
+      <button class="nav-tab hidden" id="adminBtn">👤 用户管理</button>
     </div>
   </div>
 
   <div class="container">
+    <!-- 概览 -->
     <section id="overview">
-      <div class="stats">
-        <div class="stat">收入：<span id="income">0</span></div>
-        <div class="stat">支出：<span id="expense">0</span></div>
-        <div class="stat">结余：<span id="balance">0</span></div>
+      <div class="stat-row">
+        <div class="stat-card"><div>本月收入</div><div class="num income-color" id="totalIncome">0</div></div>
+        <div class="stat-card"><div>本月支出</div><div class="num expense-color" id="totalExpense">0</div></div>
+        <div class="stat-card"><div>本月结余</div><div class="num" id="totalBalance">0</div></div>
       </div>
       <div class="card">
         <h4>最近记录</h4>
-        <div id="recent_list"></div>
+        <div id="recentList"></div>
       </div>
     </section>
 
+    <!-- 记账 -->
     <section id="records" class="hidden">
-      <button class="btn btn-primary" style="width:auto" onclick="openModal()">添加记录</button>
-      <div id="record_list" style="margin-top:1rem"></div>
+      <button class="btn btn-primary btn-sm" onclick="openModal()">➕ 新增记账</button>
+      <div class="card" style="margin-top:1rem"><div id="recordList"></div></div>
     </section>
 
+    <!-- 分类管理 -->
     <section id="category" class="hidden">
       <div class="card">
-        <h4>自定义分类</h4>
+        <h4>分类管理</h4>
         <div style="display:flex;gap:0.5rem;margin:1rem 0">
-          <input class="form-input" id="cat_name" placeholder="分类名">
-          <select id="cat_type" class="form-input">
+          <input class="form-control" id="catName" placeholder="分类名称">
+          <select class="form-control" id="catType">
             <option value="income">收入</option>
             <option value="expense">支出</option>
           </select>
-          <button class="btn btn-primary" style="width:auto" onclick="addCategory()">添加</button>
+          <button class="btn btn-primary btn-sm" onclick="addCategory()">添加</button>
         </div>
-        <div id="cat_list"></div>
+        <div id="myCategories"></div>
       </div>
     </section>
 
-    <section id="admin" class="hidden">
+    <!-- 图表 -->
+    <section id="charts" class="hidden">
       <div class="card">
-        <h4>用户审核</h4>
-        <div id="user_list"></div>
+        <h4>支出构成（饼图）</h4>
+        <div class="chart-box"><canvas id="pieChart"></canvas></div>
       </div>
+      <div class="card">
+        <h4>月度趋势（柱状图）</h4>
+        <div class="chart-box"><canvas id="barChart"></canvas></div>
+      </div>
+    </section>
+
+    <!-- 管理员 -->
+    <section id="adminPage" class="hidden">
+      <div class="card"><h4>用户审核</h4><div id="userList"></div></div>
     </section>
   </div>
 
-  <button class="fab" onclick="openModal()">+</button>
+  <button class="fab" onclick="openModal()">➕</button>
 
+  <!-- 记账弹窗 -->
   <div class="hidden" id="modal">
-    <div class="modal-content">
-      <h3>添加记录</h3>
+    <div class="modal-body">
+      <h3>新增记账</h3>
       <div style="display:flex;gap:0.5rem;margin:1rem 0">
-        <button class="btn" onclick="setTransType('expense')">支出</button>
-        <button class="btn" onclick="setTransType('income')">收入</button>
+        <button class="btn btn-sm" id="btnExpense" onclick="setType('expense')">支出</button>
+        <button class="btn btn-sm" id="btnIncome" onclick="setType('income')">收入</button>
       </div>
-      <input class="form-input" type="number" placeholder="金额" id="amount">
-      <div class="grid" id="cat_grid"></div>
-      <input class="form-input" type="date" id="trans_date">
-      <input class="form-input" placeholder="备注" id="note">
-      <button class="btn btn-primary" onclick="saveTrans()">保存</button>
+      <input class="form-control" type="number" placeholder="金额" id="amount">
+      <div class="grid" id="catGrid"></div>
+      <input class="form-control" type="date" id="transDate">
+      <input class="form-control" placeholder="备注" id="note">
+      <button class="btn btn-primary" onclick="saveRecord()">保存</button>
       <button class="btn btn-secondary" onclick="closeModal()">取消</button>
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// 关键修复：变量名不冲突，正常初始化
+// ============== 你的 Supabase 配置 ==============
 const sb = supabase.createClient(
   "https://nvqqfmvtyqzxxcgoeriv.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cXFmbXZ0eXF6eHhjZ29lcml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTAyODIsImV4cCI6MjA4OTg2NjI4Mn0.PoZYNU7ShemdTA_HCAK3Sp9t2OfswFI9ttmsVeE98T0"
@@ -186,194 +180,236 @@ const sb = supabase.createClient(
 let currentUser = null;
 let transType = "expense";
 let selectedCat = null;
+let pieChart, barChart;
 
-// 页面切换
-document.querySelectorAll('.nav-tab').forEach(tab => {
+// 预置分类（带图标）
+const defaultCats = {
+  income: [
+    { name: "工资", icon: "bi-wallet2" },
+    { name: "奖金", icon: "bi-trophy" },
+    { name: "兼职", icon: "bi-briefcase" },
+    { name: "理财", icon: "bi-graph-up" },
+    { name: "红包", icon: "bi-gift" }
+  ],
+  expense: [
+    { name: "餐饮", icon: "bi-cup-hot" },
+    { name: "交通", icon: "bi-bus-front" },
+    { name: "购物", icon: "bi-bag" },
+    { name: "娱乐", icon: "bi-controller" },
+    { name: "医疗", icon: "bi-heart-pulse" },
+    { name: "教育", icon: "bi-book" },
+    { name: "住房", icon: "bi-house" },
+    { name: "通讯", icon: "bi-phone" }
+  ]
+};
+
+// ============== 页面切换 ==============
+document.querySelectorAll(".nav-tab").forEach(tab => {
   tab.onclick = () => {
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    document.querySelectorAll('#overview, #records, #category, #admin').forEach(s => s.classList.add('hidden'));
-    document.getElementById(tab.dataset.page).classList.remove('hidden');
+    document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
+    const id = tab.dataset.page + (tab.dataset.page === "admin" ? "Page" : "");
+    document.getElementById(id).classList.remove("hidden");
+    if (id === "charts") renderCharts();
   };
 });
 
-function showReg() {
-  document.getElementById('login-form').classList.add('hidden');
-  document.getElementById('reg-form').classList.remove('hidden');
-}
-function showLogin() {
-  document.getElementById('reg-form').classList.add('hidden');
-  document.getElementById('login-form').classList.remove('hidden');
-}
+// ============== 登录注册 ==============
+function showReg() { document.getElementById("loginCard").classList.add("hidden"); document.getElementById("regCard").classList.remove("hidden"); }
+function showLogin() { document.getElementById("regCard").classList.add("hidden"); document.getElementById("loginCard").classList.remove("hidden"); }
 
-// 注册
-async function doRegister() {
-  const username = document.getElementById('reg_user').value.trim();
-  const password = document.getElementById('reg_pwd').value.trim();
-  const err = document.getElementById('reg_err');
-  if (!username || !password) { err.textContent = '请填写完整'; return; }
-
-  const { data: exists } = await sb.from('users').select('*').eq('username', username);
-  if (exists.length > 0) { err.textContent = '用户已存在'; return; }
-
-  await sb.from('users').insert([{ username, password, role: 'user', status: 'pending' }]);
-  alert('注册成功，请等待管理员审核');
+async function register() {
+  const u = document.getElementById("regUser").value.trim();
+  const p = document.getElementById("regPwd").value.trim();
+  if (!u || !p) { document.getElementById("regErr").innerText = "请填写完整"; return; }
+  const { data } = await sb.from("users").select("*").eq("username", u);
+  if (data.length) { document.getElementById("regErr").innerText = "用户已存在"; return; }
+  await sb.from("users").insert([{ username: u, password: p, role: "user", status: "pending" }]);
+  alert("注册成功，请等待管理员审核");
   showLogin();
 }
 
-// 登录
-async function doLogin() {
-  const username = document.getElementById('login_user').value.trim();
-  const password = document.getElementById('login_pwd').value.trim();
-  const err = document.getElementById('login_err');
-  if (!username || !password) { err.textContent = '请输入账号密码'; return; }
-
-  const { data, error } = await sb.from('users')
-    .select('*')
-    .eq('username', username)
-    .eq('password', password);
-
-  if (error || data.length === 0) { err.textContent = '账号或密码错误'; return; }
-
+async function login() {
+  const u = document.getElementById("loginUser").value.trim();
+  const p = document.getElementById("loginPwd").value.trim();
+  const { data } = await sb.from("users").select("*").eq("username", u).eq("password", p);
+  if (!data.length) { document.getElementById("loginErr").innerText = "账号或密码错误"; return; }
   const user = data[0];
-  if (user.status !== 'approved') { err.textContent = '账号未审核'; return; }
-
+  if (user.status !== "approved") { document.getElementById("loginErr").innerText = "账号未审核"; return; }
   currentUser = user;
-  document.getElementById('auth-page').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-  document.getElementById('nickname').textContent = currentUser.username;
-
-  if (user.role === 'admin') {
-    document.getElementById('admin_tab').classList.remove('hidden');
-  }
-
+  document.getElementById("auth").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("userName").innerText = user.username;
+  if (user.role === "admin") document.getElementById("adminBtn").classList.remove("hidden");
+  initDefaultCats();
   loadAll();
 }
 
-function logout() {
-  currentUser = null;
-  document.getElementById('auth-page').classList.remove('hidden');
-  document.getElementById('app').classList.add('hidden');
-  document.getElementById('admin_tab').classList.add('hidden');
+function logout() { location.reload(); }
+
+// ============== 初始化默认分类 ==============
+async function initDefaultCats() {
+  const { data } = await sb.from("categories").select("*").eq("username", currentUser.username);
+  if (data.length > 0) return;
+  const all = [];
+  defaultCats.income.forEach(c => all.push({ username: currentUser.username, type: "income", name: c.name, icon: c.icon }));
+  defaultCats.expense.forEach(c => all.push({ username: currentUser.username, type: "expense", name: c.name, icon: c.icon }));
+  await sb.from("categories").insert(all);
 }
 
-// 管理员审核
-async function loadAdmin() {
-  const { data } = await sb.from('users').select('*');
-  const html = data.map(u => `
-    <div class="transaction-item">
-      <span>${u.username} (${u.role}) ${u.status}</span>
-      ${u.status === 'pending' ? `<button onclick="approve('${u.username}')">通过</button>` : ''}
-    </div>
-  `).join('');
-  document.getElementById('user_list').innerHTML = html;
-}
-
-async function approve(username) {
-  await sb.from('users').update({ status: 'approved' }).eq('username', username);
-  loadAdmin();
-}
-
-// 分类
+// ============== 分类管理 ==============
 async function addCategory() {
-  const name = document.getElementById('cat_name').value.trim();
-  const type = document.getElementById('cat_type').value;
+  const name = document.getElementById("catName").value.trim();
+  const type = document.getElementById("catType").value;
   if (!name) return;
-  await sb.from('categories').insert([{ username: currentUser.username, type, name }]);
-  loadCategory();
+  await sb.from("categories").insert([{ username: currentUser.username, type, name, icon: "bi-tag" }]);
+  loadCategories();
 }
 
-async function loadCategory() {
-  const { data } = await sb.from('categories').select('*').eq('username', currentUser.username);
-  const income = data.filter(c => c.type === 'income');
-  const expense = data.filter(c => c.type === 'expense');
-  document.getElementById('cat_list').innerHTML = `
-    <div>收入分类：${income.map(i=>i.name).join('、')}</div>
-    <div>支出分类：${expense.map(i=>i.name).join('、')}</div>
+async function deleteCategory(id) {
+  await sb.from("categories").delete().eq("id", id);
+  loadCategories();
+}
+
+async function loadCategories() {
+  const { data } = await sb.from("categories").select("*").eq("username", currentUser.username);
+  const inList = data.filter(c => c.type === "income");
+  const exList = data.filter(c => c.type === "expense");
+  document.getElementById("myCategories").innerHTML = `
+    <div style="margin-bottom:1rem"><strong>收入分类</strong></div>
+    ${inList.map(c => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem;border-bottom:1px solid #eee">
+        <span><i class="${c.icon} income-color"></i> ${c.name}</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})">删除</button>
+      </div>
+    `).join("")}
+    <div style="margin:1rem 0"><strong>支出分类</strong></div>
+    ${exList.map(c => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem;border-bottom:1px solid #eee">
+        <span><i class="${c.icon} expense-color"></i> ${c.name}</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})">删除</button>
+      </div>
+    `).join("")}
   `;
   refreshCatGrid();
 }
 
-function setTransType(t) {
+// ============== 记账弹窗 ==============
+function setType(t) {
   transType = t;
   refreshCatGrid();
 }
 
 async function refreshCatGrid() {
-  const { data } = await sb.from('categories').select('*')
-    .eq('username', currentUser.username)
-    .eq('type', transType);
-  document.getElementById('cat_grid').innerHTML = data.map(c => `
-    <button class="category-btn" onclick="selectCat(this,'${c.name}')">${c.name}</button>
-  `).join('');
+  const { data } = await sb.from("categories").select("*").eq("username", currentUser.username).eq("type", transType);
+  document.getElementById("catGrid").innerHTML = data.map(c => `
+    <div class="category-item" onclick="selectCat(this,'${c.name}')">
+      <i class="${c.icon} ${transType === "income" ? "income-color" : "expense-color"}"></i>
+      <div>${c.name}</div>
+    </div>
+  `).join("");
 }
 
 function selectCat(el, name) {
-  document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
+  document.querySelectorAll(".category-item").forEach(i => i.classList.remove("selected"));
+  el.classList.add("selected");
   selectedCat = name;
 }
 
-// 记账
 function openModal() {
-  document.getElementById('modal').classList.remove('hidden');
-  document.getElementById('trans_date').valueAsDate = new Date();
+  document.getElementById("modal").classList.remove("hidden");
+  document.getElementById("transDate").valueAsDate = new Date();
   refreshCatGrid();
 }
-function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
-async function saveTrans() {
-  const amount = Number(document.getElementById('amount').value);
-  const date = document.getElementById('trans_date').value;
-  const note = document.getElementById('note').value;
+function closeModal() { document.getElementById("modal").classList.add("hidden"); }
+
+async function saveRecord() {
+  const amount = Number(document.getElementById("amount").value);
+  const date = document.getElementById("transDate").value;
+  const note = document.getElementById("note").value;
   if (!amount || !selectedCat) return;
-
-  await sb.from('transactions').insert([{
-    username: currentUser.username,
-    type: transType,
-    amount,
-    date,
-    note,
-    category: selectedCat
+  await sb.from("transactions").insert([{
+    username: currentUser.username, type: transType, amount, date, note, category: selectedCat
   }]);
   closeModal();
   loadAll();
 }
 
-// 数据加载
+// ============== 数据加载 ==============
 async function loadAll() {
   loadOverview();
   loadRecords();
-  loadCategory();
-  if (currentUser.role === 'admin') loadAdmin();
+  loadCategories();
+  if (currentUser.role === "admin") loadAdmin();
 }
 
 async function loadOverview() {
-  const { data } = await sb.from('transactions').select('*').eq('username', currentUser.username);
-  const income = data.filter(t=>t.type==='income').reduce((s,i)=>s+i.amount,0);
-  const expense = data.filter(t=>t.type==='expense').reduce((s,i)=>s+i.amount,0);
-  document.getElementById('income').textContent = income;
-  document.getElementById('expense').textContent = expense;
-  document.getElementById('balance').textContent = income - expense;
+  const { data } = await sb.from("transactions").select("*").eq("username", currentUser.username);
+  const income = data.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const expense = data.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  document.getElementById("totalIncome").innerText = income;
+  document.getElementById("totalExpense").innerText = expense;
+  document.getElementById("totalBalance").innerText = income - expense;
 
-  const recent = data.slice(-5).reverse();
-  document.getElementById('recent_list').innerHTML = recent.map(t => `
-    <div class="transaction-item">
+  const recent = data.slice(-8).reverse();
+  document.getElementById("recentList").innerHTML = recent.map(t => `
+    <div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid #eee">
       <span>${t.date} ${t.category}</span>
-      <span>${t.type === 'income' ? '+' : '-' }${t.amount}</span>
+      <span class="${t.type === "income" ? "income-color" : "expense-color"}">${t.type === "income" ? "+" : "-"}${t.amount}</span>
     </div>
-  `).join('');
+  `).join("");
 }
 
 async function loadRecords() {
-  const { data } = await sb.from('transactions').select('*').eq('username', currentUser.username);
-  document.getElementById('record_list').innerHTML = data.reverse().map(t => `
-    <div class="transaction-item">
-      <span>${t.date} ${t.category}</span>
-      <span>${t.note || ''}</span>
-      <span>${t.type === 'income' ? '+' : '-' }${t.amount}</span>
+  const { data } = await sb.from("transactions").select("*").eq("username", currentUser.username);
+  document.getElementById("recordList").innerHTML = data.reverse().map(t => `
+    <div style="display:flex;justify-content:space-between;padding:0.7rem 0;border-bottom:1px solid #eee">
+      <span>${t.date} | ${t.category}</span>
+      <span>${t.note || ""}</span>
+      <span class="${t.type === "income" ? "income-color" : "expense-color"}">${t.type === "income" ? "+" : "-"}${t.amount}</span>
     </div>
-  `).join('');
+  `).join("");
+}
+
+// ============== 图表 ==============
+async function renderCharts() {
+  const { data } = await sb.from("transactions").select("*").eq("username", currentUser.username).eq("type", "expense");
+  const map = {};
+  data.forEach(t => { map[t.category] = (map[t.category] || 0) + t.amount; });
+
+  if (pieChart) pieChart.destroy();
+  pieChart = new Chart(document.getElementById("pieChart"), {
+    type: "pie", data: { labels: Object.keys(map), datasets: [{ data: Object.values(map), backgroundColor: ["#ef4444","#f97316","#8b5cf6","#3b82f6","#10b981","#ec4899"] }] }
+  });
+
+  const monthMap = {};
+  data.forEach(t => { const m = t.date.slice(0,7); monthMap[m] = (monthMap[m] || 0) + t.amount; });
+
+  if (barChart) barChart.destroy();
+  barChart = new Chart(document.getElementById("barChart"), {
+    type: "bar", data: {
+      labels: Object.keys(monthMap),
+      datasets: [{ label: "支出", data: Object.values(monthMap), backgroundColor: "#ef4444" }]
+    }
+  });
+}
+
+// ============== 管理员 ==============
+async function loadAdmin() {
+  const { data } = await sb.from("users").select("*");
+  document.getElementById("userList").innerHTML = data.map(u => `
+    <div style="display:flex;justify-content:space-between;padding:0.8rem;border-bottom:1px solid #eee">
+      <span>${u.username} | ${u.role} | ${u.status}</span>
+      ${u.status === "pending" ? `<button class="btn btn-primary btn-sm" onclick="approve('${u.username}')">通过</button>` : ""}
+    </div>
+  `).join("");
+}
+
+async function approve(username) {
+  await sb.from("users").update({ status: "approved" }).eq("username", username);
+  loadAdmin();
 }
 </script>
 </body>
