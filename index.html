@@ -9,7 +9,6 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f3f4f6; min-height: 100vh; }
     .hidden { display: none !important; }
 
-    /* 登录注册 */
     .auth-wrapper { max-width: 420px; margin: 3rem auto; padding: 2rem; background: white; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .auth-title { font-size: 1.5rem; font-weight: bold; text-align: center; margin-bottom: 1.5rem; }
     .form-group { margin-bottom: 1rem; }
@@ -19,14 +18,9 @@
     .btn-primary { width: 100%; background: #4f46e5; color: white; }
     .btn-secondary { width: 100%; background: #e5e7eb; margin-top: 0.5rem; }
     .btn-sm { padding: 0.25rem 0.75rem; font-size: 0.875rem; }
-    .text-center { text-align: center; }
-    .mt-2 { margin-top: 0.5rem; }
-    .mt-4 { margin-top: 1rem; }
-    .mb-4 { margin-bottom: 1rem; }
     .error { color: #ef4444; text-align: center; margin-top: 0.5rem; font-size: 0.875rem; }
     .link { color: #4f46e5; cursor: pointer; text-align: center; margin-top: 1rem; }
 
-    /* 主界面 */
     .navbar { background: #4f46e5; color: white; padding: 1rem; position: sticky; top: 0; z-index: 100; }
     .navbar-header { display: flex; justify-content: space-between; align-items: center; }
     .nav-tabs { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
@@ -53,15 +47,15 @@
     .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
     .modal-content { background: white; border-radius: 1rem; padding: 2rem; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
     .flex { display: flex; gap: 0.75rem; align-items: center; }
-    .gap-2 { gap: 0.5rem; }
     .text-sm { font-size: 0.875rem; }
     .text-green { color: #10b981; }
     .text-red { color: #ef4444; }
+    .mt-4 { margin-top: 1rem; }
+    .mb-4 { margin-bottom: 1rem; }
   </style>
 </head>
 <body>
 
-<!-- 登录注册 -->
 <div id="auth-page">
   <div class="auth-wrapper" id="login-box">
     <div class="auth-title">登录</div>
@@ -94,7 +88,6 @@
   </div>
 </div>
 
-<!-- 主应用 -->
 <div id="app" class="hidden">
   <div class="navbar">
     <div class="navbar-header">
@@ -115,7 +108,6 @@
   </div>
 
   <div class="container">
-    <!-- 概览 -->
     <section id="dashboard" class="page">
       <div class="stats-grid">
         <div class="stat-card stat-green">
@@ -137,13 +129,11 @@
       </div>
     </section>
 
-    <!-- 记账 -->
     <section id="transactions" class="page hidden">
       <button class="btn btn-primary mb-4" onclick="openModal()">添加记录</button>
       <div id="trans-list"></div>
     </section>
 
-    <!-- 分类管理 -->
     <section id="categories" class="page hidden">
       <div class="card">
         <div class="card-title">自定义分类</div>
@@ -159,26 +149,23 @@
       </div>
     </section>
 
-    <!-- 预算 -->
     <section id="budget" class="page hidden">
       <div class="card">
         <div class="card-title">月度预算</div>
         <input type="number" id="budget-input" class="form-input mb-4" placeholder="输入预算金额">
         <button class="btn btn-primary" onclick="saveBudget()">保存预算</button>
         <div class="budget-bar mt-4"><div class="budget-fill" id="budget-fill"></div></div>
-        <div class="mt-2 text-sm" id="budget-text"></div>
+        <div class="mt-4 text-sm" id="budget-text"></div>
       </div>
     </section>
 
-    <!-- 导出 -->
     <section id="export" class="page hidden">
       <div class="card">
         <button class="btn btn-primary" onclick="exportCSV()">导出 CSV</button>
-        <button class="btn btn-secondary mt-2" onclick="exportJSON()">导出 JSON</button>
+        <button class="btn btn-secondary mt-4" onclick="exportJSON()">导出 JSON</button>
       </div>
     </section>
 
-    <!-- 管理员 -->
     <section id="admin" class="page hidden">
       <div class="card">
         <div class="card-title">用户审核</div>
@@ -189,7 +176,6 @@
 
   <button class="fab" onclick="openModal()">+</button>
 
-  <!-- 模态框 -->
   <div class="modal hidden" id="modal">
     <div class="modal-content">
       <h3 class="mb-4">添加记录</h3>
@@ -202,17 +188,16 @@
       <input type="date" class="form-input mb-4" id="date">
       <input type="text" class="form-input mb-4" id="note" placeholder="备注">
       <button class="btn btn-primary" onclick="saveTransaction()">保存</button>
-      <button class="btn btn-secondary mt-2" onclick="closeModal()">取消</button>
+      <button class="btn btn-secondary mt-4" onclick="closeModal()">取消</button>
     </div>
   </div>
 </div>
 
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// 你的 Supabase 配置
+// ====================== 你提供的 100% 正确配置 ======================
 const supabase = supabase.createClient(
-  "https://nvqqfmvtyqzxgcgoeriv.supabase.co",
+  "https://nvqqfmvtyqzxxcgoeriv.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cXFmbXZ0eXF6eHhjZ29lcml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTAyODIsImV4cCI6MjA4OTg2NjI4Mn0.PoZYNU7ShemdTA_HCAK3Sp9t2OfswFI9ttmsVeE98T0"
 );
 
@@ -220,7 +205,6 @@ let currentUser = null;
 let transType = "expense";
 let selectedCat = null;
 
-// 页面切换
 document.querySelectorAll(".nav-tab").forEach(tab => {
   tab.onclick = () => {
     document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
@@ -230,7 +214,6 @@ document.querySelectorAll(".nav-tab").forEach(tab => {
   };
 });
 
-// 登录注册
 function showRegister() {
   document.getElementById("login-box").classList.add("hidden");
   document.getElementById("register-box").classList.remove("hidden");
@@ -244,10 +227,8 @@ async function register() {
   const user = document.getElementById("reg-user").value.trim();
   const pwd = document.getElementById("reg-pwd").value.trim();
   if (!user || !pwd) { document.getElementById("reg-error").innerText = "请填写完整"; return; }
-  
   const { data } = await supabase.from("users").select("*").eq("username", user);
   if (data.length > 0) { document.getElementById("reg-error").innerText = "用户已存在"; return; }
-  
   await supabase.from("users").insert([{ username: user, password: pwd, role: "user", status: "pending" }]);
   alert("注册成功，请等待管理员审核");
   showLogin();
@@ -257,19 +238,14 @@ async function login() {
   const user = document.getElementById("login-user").value.trim();
   const pwd = document.getElementById("login-pwd").value.trim();
   const { data } = await supabase.from("users").select("*").eq("username", user).eq("password", pwd);
-  
   if (data.length === 0) { document.getElementById("login-error").innerText = "账号或密码错误"; return; }
-  
   const u = data[0];
   if (u.status !== "approved") { document.getElementById("login-error").innerText = "账号未审核"; return; }
-  
   currentUser = u;
   document.getElementById("auth-page").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
   document.getElementById("user-name").innerText = "欢迎，" + u.username;
-  
   if (u.role === "admin") document.getElementById("admin-tab").classList.remove("hidden");
-  
   loadAllData();
 }
 
@@ -280,11 +256,9 @@ function logout() {
   document.getElementById("admin-tab").classList.add("hidden");
 }
 
-// 管理员审核
 async function loadAdmin() {
   const { data } = await supabase.from("users").select("*");
-  const list = document.getElementById("admin-user-list");
-  list.innerHTML = data.map(u => `
+  document.getElementById("admin-user-list").innerHTML = data.map(u => `
     <div class="transaction-item">
       <span>${u.username} | ${u.role} | ${u.status}</span>
       ${u.status === "pending" ? `<button class="btn btn-sm btn-primary" onclick="approve('${u.username}')">通过</button>` : ""}
@@ -297,7 +271,6 @@ async function approve(username) {
   loadAdmin();
 }
 
-// 分类管理
 async function addCategory() {
   const name = document.getElementById("new-cat-name").value.trim();
   const type = document.getElementById("new-cat-type").value;
@@ -310,7 +283,6 @@ async function loadCategories() {
   const { data } = await supabase.from("categories").select("*").eq("user", currentUser.username);
   const income = data.filter(c => c.type === "income");
   const expense = data.filter(c => c.type === "expense");
-  
   document.getElementById("cat-list").innerHTML = `
     <div><strong>收入分类</strong></div>
     ${income.map(c => `<div class="transaction-item">${c.name}</div>`).join("")}
@@ -320,7 +292,6 @@ async function loadCategories() {
   renderCatGrid();
 }
 
-// 记账
 function setType(t) {
   transType = t;
   renderCatGrid();
@@ -328,8 +299,7 @@ function setType(t) {
 
 async function renderCatGrid() {
   const { data } = await supabase.from("categories").select("*").eq("user", currentUser.username).eq("type", transType);
-  const grid = document.getElementById("cat-grid");
-  grid.innerHTML = data.map(c => `
+  document.getElementById("cat-grid").innerHTML = data.map(c => `
     <button class="category-btn" onclick="selCat(this, '${c.name}')">${c.name}</button>
   `).join("");
 }
@@ -352,52 +322,44 @@ async function saveTransaction() {
   const date = document.getElementById("date").value;
   const note = document.getElementById("note").value;
   if (!amount || !selectedCat) return;
-  
   await supabase.from("transactions").insert([{
     user: currentUser.username, type: transType, amount, date, note, category: selectedCat
   }]);
-  
   closeModal();
   loadAllData();
 }
 
-// 数据加载 & 渲染
 async function loadAllData() {
   await loadTransactions();
   await loadCategories();
   await loadBudget();
-  if (currentUser.role === "admin") await loadAdmin();
+  if (currentUser?.role === "admin") await loadAdmin();
 }
 
 async function loadTransactions() {
   const { data } = await supabase.from("transactions").select("*").eq("user", currentUser.username);
-  const list = document.getElementById("trans-list");
-  const recent = document.getElementById("recent-list");
-  
   const income = data.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const expense = data.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
-  
   document.getElementById("income-total").innerText = "¥" + income.toFixed(2);
   document.getElementById("expense-total").innerText = "¥" + expense.toFixed(2);
   document.getElementById("balance-total").innerText = "¥" + (income - expense).toFixed(2);
-  
-  list.innerHTML = data.reverse().map(t => `
+
+  document.getElementById("trans-list").innerHTML = data.reverse().map(t => `
     <div class="transaction-item">
       <span>${t.date} ${t.category}</span>
       <span>${t.note || ""}</span>
-      <span class="${t.type === "income" ? "text-green" : "text-red"}">¥${t.amount}</span>
+      <span class="${t.type === 'income' ? 'text-green' : 'text-red'}">¥${t.amount}</span>
     </div>
   `).join("");
-  
-  recent.innerHTML = data.slice(-5).reverse().map(t => `
+
+  document.getElementById("recent-list").innerHTML = data.slice(-5).reverse().map(t => `
     <div class="transaction-item">
       <span>${t.date} ${t.category}</span>
-      <span class="${t.type === "income" ? "text-green" : "text-red"}">¥${t.amount}</span>
+      <span class="${t.type === 'income' ? 'text-green' : 'text-red'}">¥${t.amount}</span>
     </div>
   `).join("");
 }
 
-// 预算
 async function saveBudget() {
   const val = Number(document.getElementById("budget-input").value);
   await supabase.from("budget").upsert([{ user: currentUser.username, amount: val }]);
@@ -410,27 +372,23 @@ async function loadBudget() {
   const { data: tData } = await supabase.from("transactions").select("*").eq("user", currentUser.username).eq("type", "expense");
   const used = tData.reduce((s, t) => s + t.amount, 0);
   const pct = Math.min(100, (used / budget) * 100) || 0;
-  
   document.getElementById("budget-fill").style.width = pct + "%";
   document.getElementById("budget-text").innerText = `已使用：¥${used} / 预算：¥${budget}`;
 }
 
-// 导出
 async function exportCSV() {
   const { data } = await supabase.from("transactions").select("*").eq("user", currentUser.username);
   const csv = "日期,类型,分类,金额,备注\n" + data.map(t => `${t.date},${t.type},${t.category},${t.amount},${t.note}`).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
+  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
   a.download = "记账数据.csv";
   a.click();
 }
 
 async function exportJSON() {
   const { data } = await supabase.from("transactions").select("*").eq("user", currentUser.username);
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
   a.download = "记账数据.json";
   a.click();
 }
