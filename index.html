@@ -25,6 +25,8 @@
     .login-btn:hover { background: #4338ca; }
     .login-error { color: #ef4444; font-size: 0.875rem; margin-top: 0.5rem; text-align: center; display: none; }
     .login-success { color: #10b981; font-size: 0.875rem; margin-top: 0.5rem; text-align: center; display: none; }
+    .login-link { color: #4f46e5; cursor: pointer; text-decoration: underline; font-size: 0.875rem; text-align: center; margin-top: 0.5rem; }
+    .login-link:hover { color: #4338ca; }
     
     .navbar { background: #4f46e5; color: white; padding: 1rem; position: sticky; top: 0; z-index: 100; }
     .navbar h1 { font-size: 1.25rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; }
@@ -59,6 +61,8 @@
     .btn { padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; border: none; font-weight: 500; font-size: 0.875rem; }
     .btn-primary { background: #4f46e5; color: white; }
     .btn-danger { background: #ef4444; color: white; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-warning { background: #f59e0b; color: white; }
     .btn-sm { padding: 0.25rem 0.75rem; font-size: 0.75rem; }
     
     .table { width: 100%; border-collapse: collapse; }
@@ -76,10 +80,12 @@
     .type-btn.income.active { background: #ecfdf5; }
     
     .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 0.5rem; margin-bottom: 1rem; }
-    .category-btn { padding: 0.75rem 0.5rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; cursor: pointer; background: white; text-align: center; }
+    .category-btn { padding: 0.75rem 0.5rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; cursor: pointer; background: white; text-align: center; position: relative; }
     .category-btn.selected { border-color: #4f46e5; background: #eef2ff; }
     .category-btn .icon { font-size: 1.5rem; display: block; margin-bottom: 0.25rem; }
     .category-btn .name { font-size: 0.75rem; color: #374151; }
+    .category-btn .delete-icon { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer; display: none; }
+    .category-btn.custom .delete-icon { display: flex; }
     
     .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
     .modal { background: white; border-radius: 1rem; padding: 1.5rem; max-width: 500px; width: 100%; }
@@ -105,9 +111,23 @@
     .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 500; }
     .badge-admin { background: #fef3c7; color: #92400e; }
     .badge-user { background: #e0e7ff; color: #3730a3; }
+    .badge-pending { background: #fed7aa; color: #92400e; }
+    .badge-approved { background: #dcfce7; color: #166534; }
+    .badge-rejected { background: #fee2e2; color: #991b1b; }
     
     .hidden { display: none !important; }
     .sync-status { position: fixed; top: 4.5rem; right: 1rem; padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.75rem; background: #dcfce7; color: #166534; }
+    
+    .alert { padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+    .alert-warning { background: #fef3c7; color: #92400e; border-left: 4px solid #f59e0b; }
+    .alert-info { background: #dbeafe; color: #1e40af; border-left: 4px solid #3b82f6; }
+    
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151; }
+    
+    .icon-picker { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+    .icon-picker-btn { padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; cursor: pointer; background: white; font-size: 1.5rem; }
+    .icon-picker-btn.selected { border-color: #4f46e5; background: #eef2ff; }
   </style>
 </head>
 <body>
@@ -120,8 +140,10 @@
       <div class="login-tabs">
         <div class="login-tab active" data-tab="login">登录</div>
         <div class="login-tab" data-tab="register">注册</div>
+        <div class="login-tab" data-tab="forgot">找回密码</div>
       </div>
       
+      <!-- 登录表单 -->
       <form id="login-form" class="login-form active">
         <input type="text" id="login-username" class="login-input" placeholder="用户名" required>
         <input type="password" id="login-password" class="login-input" placeholder="密码" required>
@@ -129,6 +151,7 @@
         <p class="login-error" id="login-error"></p>
       </form>
       
+      <!-- 注册表单 -->
       <form id="register-form" class="login-form">
         <input type="text" id="reg-username" class="login-input" placeholder="用户名" required>
         <input type="password" id="reg-password" class="login-input" placeholder="密码（至少6位）" required minlength="6">
@@ -136,6 +159,16 @@
         <button type="submit" class="login-btn">注册</button>
         <p class="login-success" id="reg-success"></p>
         <p class="login-error" id="reg-error"></p>
+      </form>
+      
+      <!-- 找回密码表单 -->
+      <form id="forgot-form" class="login-form">
+        <input type="text" id="forgot-username" class="login-input" placeholder="用户名" required>
+        <input type="password" id="forgot-password" class="login-input" placeholder="新密码（至少6位）" required minlength="6">
+        <input type="password" id="forgot-password2" class="login-input" placeholder="确认新密码" required>
+        <button type="submit" class="login-btn">重置密码</button>
+        <p class="login-success" id="forgot-success"></p>
+        <p class="login-error" id="forgot-error"></p>
       </form>
       
       <p style="margin-top: 1.5rem; text-align: center; color: #6b7280; font-size: 0.75rem;">
@@ -156,7 +189,8 @@
             <span>▼</span>
           </button>
           <div class="user-dropdown" id="user-dropdown">
-            <button id="btn-admin" class="hidden">⚙️ 用户管理</button>
+            <button id="btn-settings">⚙️ 设置</button>
+            <button id="btn-admin" class="hidden">👥 用户管理</button>
             <button id="btn-logout">🚪 退出登录</button>
           </div>
         </div>
@@ -172,6 +206,11 @@
     <div class="sync-status" id="sync-status" style="display:none;">已同步</div>
     
     <main class="container">
+      <!-- 待审核提示 -->
+      <div id="pending-alert" class="alert alert-warning hidden">
+        ⏳ 您的账号正在等待管理员审核，审核通过后即可使用所有功能。
+      </div>
+      
       <section id="dashboard" class="page">
         <div class="page-title">
           <span>月度概览</span>
@@ -250,8 +289,56 @@
           <span>用户管理</span>
           <button class="btn btn-primary btn-sm" id="btn-add-user">+ 添加用户</button>
         </div>
+        
+        <!-- 待审核用户 -->
         <div class="card">
+          <div class="card-title">⏳ 待审核注册申请</div>
+          <div id="pending-users-list"></div>
+        </div>
+        
+        <!-- 已批准用户 -->
+        <div class="card">
+          <div class="card-title">✅ 已批准用户</div>
           <div id="users-list"></div>
+        </div>
+      </section>
+      
+      <section id="settings" class="page hidden">
+        <div class="page-title">设置</div>
+        
+        <!-- 自定义类别 -->
+        <div class="card">
+          <div class="card-title">📁 自定义类别</div>
+          
+          <div style="margin-bottom: 1.5rem;">
+            <h4 style="margin-bottom: 0.75rem; font-weight: 600;">支出类别</h4>
+            <div class="category-grid" id="custom-expense-grid"></div>
+            <button class="btn btn-primary btn-sm" id="btn-add-expense-category">+ 添加支出类别</button>
+          </div>
+          
+          <div>
+            <h4 style="margin-bottom: 0.75rem; font-weight: 600;">收入类别</h4>
+            <div class="category-grid" id="custom-income-grid"></div>
+            <button class="btn btn-primary btn-sm" id="btn-add-income-category">+ 添加收入类别</button>
+          </div>
+        </div>
+        
+        <!-- 管理员全局类别设置 -->
+        <div class="card" id="admin-categories" style="display: none;">
+          <div class="card-title">🔧 全局默认类别（管理员）</div>
+          <p style="color: #6b7280; margin-bottom: 1rem; font-size: 0.875rem;">设置所有新用户的默认类别</p>
+          
+          <div style="margin-bottom: 1.5rem;">
+            <h4 style="margin-bottom: 0.75rem; font-weight: 600;">支出类别</h4>
+            <div class="category-grid" id="admin-expense-grid"></div>
+            <button class="btn btn-primary btn-sm" id="btn-admin-add-expense">+ 添加</button>
+          </div>
+          
+          <div>
+            <h4 style="margin-bottom: 0.75rem; font-weight: 600;">收入类别</h4>
+            <div class="category-grid" id="admin-income-grid"></div>
+            <button class="btn btn-primary btn-sm" id="btn-admin-add-income">+ 添加</button>
+          </div>
         </div>
       </section>
     </main>
@@ -300,15 +387,36 @@
       </form>
     </div>
   </div>
+  
+  <!-- 添加自定义类别模态框 -->
+  <div class="modal-overlay hidden" id="category-modal">
+    <div class="modal modal-sm">
+      <h3 class="modal-title">添加自定义类别</h3>
+      <form id="category-form">
+        <input type="hidden" id="category-type">
+        <div class="form-group">
+          <label>类别名称</label>
+          <input type="text" id="category-name" class="form-input" placeholder="例如：外卖" required>
+        </div>
+        <div class="form-group">
+          <label>选择图标</label>
+          <div class="icon-picker" id="icon-picker"></div>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn" style="flex:1; background:#e5e7eb;" id="btn-category-cancel">取消</button>
+          <button type="submit" class="btn btn-primary" style="flex:1;">添加</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
     // ==================== 配置 ====================
-    // 请替换为你自己的 Supabase URL 和 Key
     const SUPABASE_URL = 'https://nvqqfmvtyqzxxcgoeriv.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cXFmbXZ0eXF6eHhjZ29lcml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTAyODIsImV4cCI6MjA4OTg2NjI4Mn0.PoZYNU7ShemdTA_HCAK3Sp9t2OfswFI9ttmsVeE98T0';
 
-    // ==================== 类别配置 ====================
-    const CATEGORIES = {
+    // 默认类别
+    const DEFAULT_CATEGORIES = {
       income: [
         { id: 'salary', name: '工资', icon: '💰' },
         { id: 'parttime', name: '兼职', icon: '💼' },
@@ -329,6 +437,8 @@
       ]
     };
 
+    const ICON_PICKER = ['🍔', '🍕', '🍜', '🍱', '🍰', '🍷', '🚗', '🚕', '🚌', '🚎', '🏠', '🏢', '🏪', '🏫', '🏥', '💊', '💉', '📚', '📖', '✏️', '🎮', '🎬', '🎤', '🎧', '🎨', '🎭', '🎪', '🎯', '⚽', '🏀', '🎾', '🏐', '🏈', '⛳', '🎳', '🚴', '🏃', '🤸', '🧘', '💼', '👔', '👗', '👠', '👜', '💄', '💍', '⌚', '👓', '🎒', '🧳', '📱', '💻', '⌨️', '🖱️', '🖨️', '📷', '📹', '🎥', '📺', '📻', '☎️', '📞', '📟', '📠', '💾', '💿', '📀', '🎞️', '📽️', '🎬', '📺', '📷', '📸', '📹', '🎥', '🎬', '🎞️'];
+
     // ==================== 状态 ====================
     let currentUser = null;
     let transactions = [];
@@ -337,13 +447,17 @@
     let currentType = 'expense';
     let selectedCategory = 'food';
     let editingId = null;
+    let categories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+    let customCategories = { income: [], expense: [] };
+    let adminCategories = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+    let selectedIcon = '🍔';
+    let categoryModalType = 'expense';
 
     // ==================== 工具函数 ====================
     const $ = sel => document.querySelector(sel);
     const $$ = sel => document.querySelectorAll(sel);
 
     const formatCurrency = amount => '¥' + Number(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    
     const formatDate = date => new Date(date).toLocaleDateString('zh-CN');
     const getCurrentMonth = () => {
       const now = new Date();
@@ -377,7 +491,6 @@
           const url = `${SUPABASE_URL}/rest/v1/${table}${params}`;
           const res = await fetch(url, options);
           
-          // 检查是否是空响应
           const text = await res.text();
           if (!text) return method === 'DELETE' ? [] : null;
           
@@ -412,9 +525,17 @@
       $('#login-page').classList.add('hidden');
       $('#app-page').classList.remove('hidden');
       $('#current-username').textContent = currentUser.username;
+      
+      // 显示待审核提示
+      if (currentUser.status === 'pending') {
+        $('#pending-alert').classList.remove('hidden');
+      } else {
+        $('#pending-alert').classList.add('hidden');
+      }
+      
       if (currentUser.role === 'admin') {
         $('#btn-admin').classList.remove('hidden');
-        // 添加用户管理标签
+        $('#admin-categories').style.display = 'block';
         if (!$('[data-tab="admin"]')) {
           const tab = document.createElement('button');
           tab.className = 'nav-tab';
@@ -443,7 +564,13 @@
         if (user.password !== simpleHash(password)) {
           return { success: false, error: '密码错误' };
         }
-        currentUser = { id: user.id, username: user.username, role: user.role };
+        if (user.status === 'pending') {
+          return { success: false, error: '账号待审核，请联系管理员' };
+        }
+        if (user.status === 'rejected') {
+          return { success: false, error: '注册申请已被拒绝' };
+        }
+        currentUser = { id: user.id, username: user.username, role: user.role, status: user.status };
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
         return { success: true };
       } catch (err) {
@@ -462,6 +589,7 @@
           username,
           password: simpleHash(password),
           role: 'user',
+          status: 'pending',
           created_at: new Date().toISOString()
         });
         return { success: true };
@@ -470,10 +598,25 @@
       }
     };
 
+    const resetPassword = async (username, newPassword) => {
+      try {
+        const data = await api.get('users', `?username=eq.${username}`);
+        if (!data || data.length === 0) {
+          return { success: false, error: '用户不存在' };
+        }
+        const user = data[0];
+        await api.put('users', { password: simpleHash(newPassword) }, `?id=eq.${user.id}`);
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: '重置失败，请检查网络' };
+      }
+    };
+
     const logout = () => {
       localStorage.removeItem('currentUser');
       localStorage.removeItem('transactions');
       localStorage.removeItem('budgets');
+      localStorage.removeItem('customCategories');
       showLogin();
     };
 
@@ -490,10 +633,30 @@
           budgets = { total: budgetData[0].total || 0 };
           localStorage.setItem('budgets', JSON.stringify(budgets));
         }
+        
+        // 加载自定义类别
+        const customCatData = await api.get('custom_categories', `?user_id=eq.${currentUser.id}`);
+        if (customCatData && customCatData.length > 0) {
+          customCategories = { income: [], expense: [] };
+          customCatData.forEach(cat => {
+            customCategories[cat.type].push({ id: cat.id, name: cat.name, icon: cat.icon, custom: true });
+          });
+          localStorage.setItem('customCategories', JSON.stringify(customCategories));
+          mergeCategories();
+        }
       } catch (err) {
         transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
         budgets = JSON.parse(localStorage.getItem('budgets') || '{"total": 0}');
+        customCategories = JSON.parse(localStorage.getItem('customCategories') || '{"income":[],"expense":[]}');
+        mergeCategories();
       }
+    };
+
+    const mergeCategories = () => {
+      categories = {
+        income: [...DEFAULT_CATEGORIES.income, ...customCategories.income],
+        expense: [...DEFAULT_CATEGORIES.expense, ...customCategories.expense]
+      };
     };
 
     const saveTransaction = async (data) => {
@@ -512,7 +675,6 @@
         renderCurrentPage();
         alert('保存成功');
       } catch (err) {
-        // 即使 API 报错，数据已保存到本地
         if (editingId) {
           transactions = transactions.map(t => t.id === editingId ? { ...tx, id: editingId } : t);
         } else {
@@ -534,17 +696,54 @@
         localStorage.setItem('transactions', JSON.stringify(transactions));
         renderCurrentPage();
       } catch (err) {
-        // API 失败也从本地删除
         transactions = transactions.filter(t => t.id !== id);
         localStorage.setItem('transactions', JSON.stringify(transactions));
         renderCurrentPage();
       }
     };
 
+    const addCustomCategory = async (type, name, icon) => {
+      try {
+        const catId = generateId();
+        await api.post('custom_categories', {
+          id: catId,
+          user_id: currentUser.id,
+          type,
+          name,
+          icon
+        });
+        customCategories[type].push({ id: catId, name, icon, custom: true });
+        localStorage.setItem('customCategories', JSON.stringify(customCategories));
+        mergeCategories();
+        renderSettings();
+      } catch (err) {
+        customCategories[type].push({ id: generateId(), name, icon, custom: true });
+        localStorage.setItem('customCategories', JSON.stringify(customCategories));
+        mergeCategories();
+        renderSettings();
+      }
+    };
+
+    const deleteCustomCategory = async (type, id) => {
+      if (!confirm('确定删除此类别？')) return;
+      try {
+        await api.delete('custom_categories', `?id=eq.${id}`);
+        customCategories[type] = customCategories[type].filter(c => c.id !== id);
+        localStorage.setItem('customCategories', JSON.stringify(customCategories));
+        mergeCategories();
+        renderSettings();
+      } catch (err) {
+        customCategories[type] = customCategories[type].filter(c => c.id !== id);
+        localStorage.setItem('customCategories', JSON.stringify(customCategories));
+        mergeCategories();
+        renderSettings();
+      }
+    };
+
     // ==================== 渲染 ====================
     const renderCategories = type => {
       const grid = $('#category-grid');
-      grid.innerHTML = CATEGORIES[type].map(cat => `
+      grid.innerHTML = categories[type].map(cat => `
         <button type="button" class="category-btn ${cat.id === selectedCategory ? 'selected' : ''}" data-id="${cat.id}">
           <span class="icon">${cat.icon}</span>
           <span class="name">${cat.name}</span>
@@ -558,6 +757,18 @@
           selectedCategory = btn.dataset.id;
         };
       });
+    };
+
+    const renderCustomCategories = (type, containerId) => {
+      const grid = $(`#${containerId}`);
+      const cats = categories[type];
+      grid.innerHTML = cats.map(cat => `
+        <div class="category-btn ${cat.custom ? 'custom' : ''}">
+          <span class="icon">${cat.icon}</span>
+          <span class="name">${cat.name}</span>
+          ${cat.custom ? `<div class="delete-icon" onclick="deleteCustomCategory('${type}', '${cat.id}')">×</div>` : ''}
+        </div>
+      `).join('');
     };
 
     const renderDashboard = () => {
@@ -574,7 +785,7 @@
       $('#recent-transactions').innerHTML = recent.length === 0 
         ? '<p class="empty-state">暂无记录</p>'
         : recent.map(t => {
-          const cat = CATEGORIES[t.type].find(c => c.id === t.category);
+          const cat = categories[t.type].find(c => c.id === t.category);
           return `
             <div class="transaction-item">
               <div class="transaction-left">
@@ -601,7 +812,7 @@
             <thead><tr><th>日期</th><th>类别</th><th>金额</th><th></th></tr></thead>
             <tbody>
               ${monthly.map(t => {
-                const cat = CATEGORIES[t.type].find(c => c.id === t.category);
+                const cat = categories[t.type].find(c => c.id === t.category);
                 return `
                   <tr>
                     <td>${formatDate(t.date)}</td>
@@ -641,19 +852,54 @@
       $('#export-info').textContent = `共 ${transactions.length} 条记录`;
     };
 
+    const renderSettings = () => {
+      renderCustomCategories('expense', 'custom-expense-grid');
+      renderCustomCategories('income', 'custom-income-grid');
+      
+      if (currentUser?.role === 'admin') {
+        renderCustomCategories('expense', 'admin-expense-grid');
+        renderCustomCategories('income', 'admin-income-grid');
+      }
+    };
+
     const renderAdmin = async () => {
       if (currentUser?.role !== 'admin') return;
       try {
         const users = await api.get('users', '?order=created_at.desc');
         const allTx = await api.get('transactions', '?order=date.desc');
         
-        // 生成用户列表
-        const usersHtml = users && users.length > 0
+        // 待审核用户
+        const pendingUsers = users ? users.filter(u => u.status === 'pending') : [];
+        const pendingHtml = pendingUsers.length > 0
+          ? `
+            <table class="table">
+              <thead><tr><th>用户名</th><th>注册时间</th><th>操作</th></tr></thead>
+              <tbody>
+                ${pendingUsers.map(u => `
+                  <tr>
+                    <td>${u.username}</td>
+                    <td>${formatDate(u.created_at)}</td>
+                    <td>
+                      <button class="btn btn-sm btn-success" onclick="approveUser('${u.id}')">通过</button>
+                      <button class="btn btn-sm btn-danger" onclick="rejectUser('${u.id}')">拒绝</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `
+          : '<p class="empty-state">暂无待审核用户</p>';
+        
+        $('#pending-users-list').innerHTML = pendingHtml;
+        
+        // 已批准用户
+        const approvedUsers = users ? users.filter(u => u.status !== 'pending' && u.status !== 'rejected') : [];
+        const usersHtml = approvedUsers.length > 0
           ? `
             <table class="table">
               <thead><tr><th>用户名</th><th>角色</th><th>记账数</th><th>操作</th></tr></thead>
               <tbody>
-                ${users.map(u => {
+                ${approvedUsers.map(u => {
                   const userTxCount = allTx ? allTx.filter(t => t.user_id === u.id).length : 0;
                   return `
                     <tr>
@@ -672,7 +918,9 @@
           `
           : '<p class="empty-state">暂无用户</p>';
         
-        // 生成所有交易概览
+        $('#users-list').innerHTML = usersHtml;
+        
+        // 所有交易概览
         const txHtml = allTx && allTx.length > 0
           ? `
             <div style="margin-top: 1.5rem;">
@@ -682,7 +930,7 @@
                 <tbody>
                   ${allTx.slice(0, 20).map(t => {
                     const user = users?.find(u => u.id === t.user_id);
-                    const cat = CATEGORIES[t.type]?.find(c => c.id === t.category);
+                    const cat = categories[t.type]?.find(c => c.id === t.category);
                     return `
                       <tr>
                         <td>${formatDate(t.date)}</td>
@@ -700,9 +948,10 @@
           `
           : '<p class="empty-state">暂无记账记录</p>';
         
-        $('#users-list').innerHTML = usersHtml + txHtml;
+        $('#users-list').innerHTML += txHtml;
       } catch (err) {
-        $('#users-list').innerHTML = '<p class="empty-state">加载失败: ' + err.message + '</p>';
+        $('#pending-users-list').innerHTML = '<p class="empty-state">加载失败</p>';
+        $('#users-list').innerHTML = '<p class="empty-state">加载失败</p>';
       }
     };
 
@@ -712,12 +961,19 @@
       $(`.nav-tab[data-tab="${tab}"]`)?.classList.add('active');
       $$('.page').forEach(p => p.classList.add('hidden'));
       $(`#${tab}`)?.classList.remove('hidden');
-      $('#fab-add')?.classList.toggle('hidden', ['budget', 'export', 'admin'].includes(tab));
+      $('#fab-add')?.classList.toggle('hidden', ['budget', 'export', 'admin', 'settings'].includes(tab));
       if (tab === 'dashboard') renderDashboard();
       else if (tab === 'transactions') renderTransactions();
       else if (tab === 'budget') renderBudget();
       else if (tab === 'export') renderExport();
       else if (tab === 'admin') renderAdmin();
+      else if (tab === 'settings') renderSettings();
+    };
+
+    const renderCurrentPage = () => {
+      if (currentTab === 'dashboard') renderDashboard();
+      else if (currentTab === 'transactions') renderTransactions();
+      else if (currentTab === 'budget') renderBudget();
     };
 
     const openModal = (edit = null) => {
@@ -748,12 +1004,43 @@
       editingId = null;
     };
 
+    const openCategoryModal = type => {
+      categoryModalType = type;
+      $('#category-type').value = type;
+      $('#category-name').value = '';
+      selectedIcon = '🍔';
+      renderIconPicker();
+      $('#category-modal').classList.remove('hidden');
+    };
+
+    const closeCategoryModal = () => {
+      $('#category-modal').classList.add('hidden');
+    };
+
+    const renderIconPicker = () => {
+      const picker = $('#icon-picker');
+      picker.innerHTML = ICON_PICKER.map(icon => `
+        <button type="button" class="icon-picker-btn ${icon === selectedIcon ? 'selected' : ''}" data-icon="${icon}">
+          ${icon}
+        </button>
+      `).join('');
+      
+      picker.querySelectorAll('.icon-picker-btn').forEach(btn => {
+        btn.onclick = () => {
+          picker.querySelectorAll('.icon-picker-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selectedIcon = btn.dataset.icon;
+        };
+      });
+    };
+
     window.editTransaction = id => {
       const t = transactions.find(tr => tr.id === id);
       if (t) openModal(t);
     };
 
     window.deleteTransaction = deleteTransaction;
+    window.deleteCustomCategory = deleteCustomCategory;
 
     window.editUser = async id => {
       try {
@@ -783,6 +1070,28 @@
       }
     };
 
+    window.approveUser = async id => {
+      if (!confirm('确定通过此注册申请？')) return;
+      try {
+        await api.put('users', { status: 'approved' }, `?id=eq.${id}`);
+        renderAdmin();
+        alert('已通过');
+      } catch (err) {
+        alert('操作失败');
+      }
+    };
+
+    window.rejectUser = async id => {
+      if (!confirm('确定拒绝此注册申请？')) return;
+      try {
+        await api.put('users', { status: 'rejected' }, `?id=eq.${id}`);
+        renderAdmin();
+        alert('已拒绝');
+      } catch (err) {
+        alert('操作失败');
+      }
+    };
+
     const saveUser = async e => {
       e.preventDefault();
       const id = $('#edit-user-id').value;
@@ -800,6 +1109,7 @@
             username,
             password: simpleHash(password),
             role,
+            status: 'approved',
             created_at: new Date().toISOString()
           });
         }
@@ -811,12 +1121,20 @@
       }
     };
 
+    const saveCategory = async e => {
+      e.preventDefault();
+      const name = $('#category-name').value;
+      if (!name) return alert('请输入类别名称');
+      await addCustomCategory(categoryModalType, name, selectedIcon);
+      closeCategoryModal();
+    };
+
     const exportData = type => {
       if (transactions.length === 0) return alert('暂无数据');
       let content, filename, mime;
       if (type === 'csv') {
         const rows = [['日期', '类型', '类别', '金额', '备注'], ...transactions.map(t => {
-          const cat = CATEGORIES[t.type].find(c => c.id === t.category);
+          const cat = categories[t.type].find(c => c.id === t.category);
           return [t.date, t.type === 'income' ? '收入' : '支出', cat?.name || t.category, t.amount, t.note || ''];
         })];
         content = rows.map(r => r.join(',')).join('\n');
@@ -829,7 +1147,7 @@
       } else {
         let html = '<table><thead><tr><th>日期</th><th>类型</th><th>类别</th><th>金额</th><th>备注</th></tr></thead><tbody>';
         transactions.forEach(t => {
-          const cat = CATEGORIES[t.type].find(c => c.id === t.category);
+          const cat = categories[t.type].find(c => c.id === t.category);
           html += `<tr><td>${t.date}</td><td>${t.type === 'income' ? '收入' : '支出'}</td><td>${cat?.name || t.category}</td><td>${t.amount}</td><td>${t.note || ''}</td></tr>`;
         });
         html += '</tbody></table>';
@@ -844,19 +1162,6 @@
       a.click();
     };
 
-    // 用户模态框
-    $('#btn-add-user')?.addEventListener('click', () => {
-      $('#edit-user-id').value = '';
-      $('#new-username').value = '';
-      $('#new-password').value = '';
-      $('#new-role').value = 'user';
-      $('#user-modal-title').textContent = '添加用户';
-      $('#user-modal').classList.remove('hidden');
-    });
-
-    $('#btn-user-cancel').onclick = () => $('#user-modal').classList.add('hidden');
-    $('#user-form').onsubmit = saveUser;
-
     // 初始化应用
     const initApp = async () => {
       const month = getCurrentMonth();
@@ -867,13 +1172,14 @@
       $('#btn-add-transaction').onclick = () => openModal();
       $('#fab-add').onclick = () => openModal();
       $('#btn-cancel').onclick = closeModal;
+      $('#btn-settings').onclick = () => switchTab('settings');
       
       $$('.type-btn').forEach(btn => {
         btn.onclick = () => {
           currentType = btn.dataset.type;
           $$('.type-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
-          selectedCategory = CATEGORIES[currentType][0].id;
+          selectedCategory = categories[currentType][0].id;
           renderCategories(currentType);
         };
       });
@@ -912,6 +1218,27 @@
       $('#btn-admin').onclick = () => switchTab('admin');
       $('#btn-logout').onclick = logout;
       
+      // 自定义类别
+      $('#btn-add-expense-category').onclick = () => openCategoryModal('expense');
+      $('#btn-add-income-category').onclick = () => openCategoryModal('income');
+      $('#btn-admin-add-expense').onclick = () => openCategoryModal('expense');
+      $('#btn-admin-add-income').onclick = () => openCategoryModal('income');
+      $('#btn-category-cancel').onclick = closeCategoryModal;
+      $('#category-form').onsubmit = saveCategory;
+      
+      // 用户模态框
+      $('#btn-add-user')?.addEventListener('click', () => {
+        $('#edit-user-id').value = '';
+        $('#new-username').value = '';
+        $('#new-password').value = '';
+        $('#new-role').value = 'user';
+        $('#user-modal-title').textContent = '添加用户';
+        $('#user-modal').classList.remove('hidden');
+      });
+
+      $('#btn-user-cancel').onclick = () => $('#user-modal').classList.add('hidden');
+      $('#user-form').onsubmit = saveUser;
+      
       $('#user-btn').onclick = () => $('#user-dropdown').classList.toggle('show');
       document.addEventListener('click', e => {
         if (!e.target.closest('.user-menu')) $('#user-dropdown').classList.remove('show');
@@ -919,6 +1246,7 @@
       
       $('#modal').onclick = e => { if (e.target.id === 'modal') closeModal(); };
       $('#user-modal').onclick = e => { if (e.target.id === 'user-modal') $('#user-modal').classList.add('hidden'); };
+      $('#category-modal').onclick = e => { if (e.target.id === 'category-modal') closeCategoryModal(); };
       
       await loadData();
       renderDashboard();
@@ -956,13 +1284,33 @@
         }
         const result = await register($('#reg-username').value, pw);
         if (result.success) {
-          $('#reg-success').textContent = '注册成功！请登录';
+          $('#reg-success').textContent = '注册成功！请等待管理员审核';
           $('#reg-success').style.display = 'block';
           $('#reg-error').style.display = 'none';
-          setTimeout(() => $('[data-tab="login"]').click(), 1000);
+          setTimeout(() => $('[data-tab="login"]').click(), 2000);
         } else {
           $('#reg-error').textContent = result.error;
           $('#reg-error').style.display = 'block';
+        }
+      };
+      
+      $('#forgot-form').onsubmit = async e => {
+        e.preventDefault();
+        const pw = $('#forgot-password').value;
+        if (pw !== $('#forgot-password2').value) {
+          $('#forgot-error').textContent = '两次密码不一致';
+          $('#forgot-error').style.display = 'block';
+          return;
+        }
+        const result = await resetPassword($('#forgot-username').value, pw);
+        if (result.success) {
+          $('#forgot-success').textContent = '密码重置成功！请登录';
+          $('#forgot-success').style.display = 'block';
+          $('#forgot-error').style.display = 'none';
+          setTimeout(() => $('[data-tab="login"]').click(), 1500);
+        } else {
+          $('#forgot-error').textContent = result.error;
+          $('#forgot-error').style.display = 'block';
         }
       };
       
