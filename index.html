@@ -61,7 +61,7 @@
     <input class="form-control" id="regUser" placeholder="用户名">
     <input type="password" class="form-control" id="regPwd" placeholder="密码">
     <button class="btn btn-primary" onclick="register()">注册</button>
-    <button class="btn btn-secondary" onclick="showLogin()">返回登录</button>
+    <button class="btn-secondary" onclick="showLogin()">返回登录</button>
     <div class="err" id="regErr"></div>
   </div>
 </div>
@@ -159,7 +159,8 @@ const sb = supabase.createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cXFmbXZ0eXF6eHhjZ29lcml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTAyODIsImV4cCI6MjA4OTg2NjI4Mn0.PoZYNU7ShemdTA_HCAK3Sp9t2OfswFI9ttmsVeE98T0"
 );
 
-let currentUser;
+// 🌟 核心修改：使用 localStorage 持久化存储
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
 let ttype = "expense";
 let selectedCat;
 let pie, bar;
@@ -174,6 +175,22 @@ const defaultCats = {
     {name:"娱乐",icon:"bi-controller"},{name:"医疗",icon:"bi-heart-pulse"},{name:"教育",icon:"bi-book"},
     {name:"住房",icon:"bi-house"},{name:"通讯",icon:"bi-phone"}
   ]
+};
+
+// 🌟 修复：页面加载时自动检查登录状态
+window.onload = function() {
+  if (currentUser) {
+    auth.classList.add("hidden");
+    app.classList.remove("hidden");
+    userName.innerText = currentUser.username;
+    if(currentUser.role==="admin")adminTab.classList.remove("hidden");
+    initCats();
+    loadAll();
+  } else {
+    // 没有登录信息，显示登录页
+    auth.classList.remove("hidden");
+    app.classList.add("hidden");
+  }
 };
 
 function switchPage(page) {
@@ -204,7 +221,11 @@ async function login(){
   if(!data.length)return loginErr.innerText="账号或密码错误";
   const user=data[0];
   if(user.status!=="approved")return loginErr.innerText="未审核";
-  currentUser=user;
+  
+  // 🌟 核心修改：登录成功后存入 localStorage
+  currentUser = user;
+  localStorage.setItem('currentUser', JSON.stringify(user));
+  
   auth.classList.add("hidden");
   app.classList.remove("hidden");
   userName.innerText=user.username;
@@ -213,7 +234,12 @@ async function login(){
   loadAll();
 }
 
-function logout(){location.reload()}
+// 🌟 修复：退出时清除 localStorage
+function logout(){
+  localStorage.removeItem('currentUser');
+  currentUser = null;
+  location.reload();
+}
 
 async function initCats(){
   const {data}=await sb.from("categories").select("*").eq("username",currentUser.username);
@@ -239,170 +265,4 @@ async function loadCatSel(){
   `).join("");
 }
 
-function selCat(el,name){
-  document.querySelectorAll(".category-item").forEach(i=>i.classList.remove("selected"));
-  el.classList.add("selected");
-  selectedCat=name;
-}
-
-function openModal(){
-  modal.classList.remove("hidden");
-  tdate.valueAsDate=new Date();
-  loadCatSel();
-}
-function closeModal(){modal.classList.add("hidden")}
-
-async function saveRecord(){
-  const amt=+amount.value,dt=tdate.value,nt=note.value;
-  if(!amt||!selectedCat)return;
-  await sb.from("transactions").insert([{
-    username:currentUser.username,type:ttype,amount:amt,date:dt,note:nt,category:selectedCat
-  }]);
-  closeModal();
-  loadAll();
-}
-
-async function loadAll(){
-  loadOverview();
-  loadRecords();
-  loadCategory();
-}
-
-async function loadOverview(){
-  const {data}=await sb.from("transactions").select("*").eq("username",currentUser.username);
-  const inSum=data.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0);
-  const exSum=data.filter(t=>t.type==="expense").reduce((s,t)=>s+t.amount,0);
-  totalIncome.innerText=inSum;
-  totalExpense.innerText=exSum;
-  totalBalance.innerText=inSum-exSum;
-  recentList.innerHTML=data.slice(-10).reverse().map(t=>`
-    <div style="display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid #eee">
-      <span>${t.date} ${t.category}</span>
-      <span class="${t.type==='income'?'income-color':'expense-color'}">${t.type==='income'?'+':'-'}${t.amount}</span>
-    </div>
-  `).join("");
-}
-
-async function loadRecords(){
-  const {data}=await sb.from("transactions").select("*").eq("username",currentUser.username);
-  recordList.innerHTML=data.reverse().map(t=>`
-    <div style="display:flex;justify-content:space-between;padding:.7rem 0;border-bottom:1px solid #eee">
-      <span>${t.date} | ${t.category}</span>
-      <span>${t.note||''}</span>
-      <span class="${t.type==='income'?'income-color':'expense-color'}">${t.type==='income'?'+':'-'}${t.amount}</span>
-    </div>
-  `).join("");
-}
-
-async function addCategory(){
-  const n=catName.value.trim(),t=catType.value;
-  if(!n)return;
-  await sb.from("categories").insert([{username:currentUser.username,type:t,name:n,icon:"bi-tag"}]);
-  loadCategory();
-  catName.value="";
-}
-
-async function delCat(id){
-  await sb.from("categories").delete().eq("id",id);
-  loadCategory();
-}
-
-async function loadCategory(){
-  const {data}=await sb.from("categories").select("*").eq("username",currentUser.username);
-  const inC=data.filter(c=>c.type==="income");
-  const exC=data.filter(c=>c.type==="expense");
-  catList.innerHTML=`
-    <div style="margin-bottom:1rem"><strong>收入</strong></div>
-    ${inC.map(c=>`
-      <div style="display:flex;justify-content:space-between;padding:.5rem;border-bottom:1px solid #eee">
-        <span><i class="${c.icon} income-color"></i> ${c.name}</span>
-        <button class="btn btn-danger btn-sm" onclick="delCat(${c.id})">删除</button>
-      </div>
-    `).join("")}
-    <div style="margin:1rem 0"><strong>支出</strong></div>
-    ${exC.map(c=>`
-      <div style="display:flex;justify-content:space-between;padding:.5rem;border-bottom:1px solid #eee">
-        <span><i class="${c.icon} expense-color"></i> ${c.name}</span>
-        <button class="btn btn-danger btn-sm" onclick="delCat(${c.id})">删除</button>
-      </div>
-    `).join("")}
-  `;
-}
-
-async function renderCharts(){
-  const {data}=await sb.from("transactions").select("*").eq("username",currentUser.username).eq("type","expense");
-  const catMap={};
-  data.forEach(t=>catMap[t.category]=(catMap[t.category]||0)+t.amount);
-  if(pie)pie.destroy();
-  pie=new Chart(pieChart,{
-    type:"pie",data:{labels:Object.keys(catMap),datasets:[{data:Object.values(catMap),backgroundColor:["#ef4444","#f97316","#8b5cf6","#3b82f6","#10b981","#ec4899"]}]}
-  });
-  const month={};
-  data.forEach(t=>{const m=t.date.slice(0,7);month[m]=(month[m]||0)+t.amount});
-  if(bar)bar.destroy();
-  bar=new Chart(barChart,{
-    type:"bar",data:{labels:Object.keys(month),datasets:[{label:"支出",data:Object.values(month),backgroundColor:"#ef4444"}]}
-  });
-}
-
-// ======================================
-// 管理员功能（已修复）
-// ======================================
-async function loadAdmin() {
-  // 加载所有用户
-  const { data: users } = await sb.from("users").select("*");
-  allUsers.innerHTML = users.map(u => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.8rem;border-bottom:1px solid #eee">
-      <span>${u.username} | ${u.role} | ${u.status}</span>
-      <div>
-        ${u.status === "pending" ? `<button class="btn btn-primary btn-sm" onclick="approveUser('${u.username}')">审核通过</button>` : ""}
-        <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username}')">删除用户</button>
-      </div>
-    </div>
-  `).join("");
-
-  // 加载所有记录
-  const { data: records } = await sb.from("transactions").select("*");
-  allRecords.innerHTML = records.reverse().map(r => `
-    <div style="padding:0.7rem;border-bottom:1px solid #eee">
-      <div><strong>用户：${r.username}</strong> | ${r.date} | ${r.category}</div>
-      <div class="${r.type === 'income' ? 'income-color' : 'expense-color'}">${r.type === 'income' ? '+' : '-'}${r.amount}  ${r.note || ''}</div>
-    </div>
-  `).join("");
-}
-
-// 审核用户
-async function approveUser(username) {
-  await sb.from("users").update({ status: "approved" }).eq("username", username);
-  loadAdmin();
-}
-
-// 删除用户
-async function deleteUser(username) {
-  if (!confirm(`确定删除用户 ${username} 吗？所有数据都会删除`)) return;
-  await sb.from("users").delete().eq("username", username);
-  await sb.from("transactions").delete().eq("username", username);
-  await sb.from("categories").delete().eq("username", username);
-  loadAdmin();
-}
-
-// 管理员添加用户
-async function adminAddUser() {
-  const username = newUser.value.trim();
-  const password = newPwd.value.trim();
-  if (!username || !password) { alert("请输入用户名和密码"); return; }
-  
-  const { data } = await sb.from("users").select("*").eq("username", username);
-  if (data.length) { alert("用户已存在"); return; }
-
-  await sb.from("users").insert([{
-    username, password, role: "user", status: "approved"
-  }]);
-  
-  newUser.value = "";
-  newPwd.value = "";
-  loadAdmin();
-}
-</script>
-</body>
-</html>
+function selCat(el,name
