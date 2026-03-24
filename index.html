@@ -195,7 +195,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// ====================== 你提供的 100% 正确配置 ======================
 const supabase = supabase.createClient(
   "https://nvqqfmvtyqzxxcgoeriv.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cXFmbXZ0eXF6eHhjZ29lcml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTAyODIsImV4cCI6MjA4OTg2NjI4Mn0.PoZYNU7ShemdTA_HCAK3Sp9t2OfswFI9ttmsVeE98T0"
@@ -237,7 +236,10 @@ async function register() {
 async function login() {
   const user = document.getElementById("login-user").value.trim();
   const pwd = document.getElementById("login-pwd").value.trim();
-  const { data } = await supabase.from("users").select("*").eq("username", user).eq("password", pwd);
+  console.log("尝试登录:", user, pwd);
+  const { data, error } = await supabase.from("users").select("*").eq("username", user).eq("password", pwd);
+  console.log("登录返回:", data, error);
+  if (error) { document.getElementById("login-error").innerText = error.message; return; }
   if (data.length === 0) { document.getElementById("login-error").innerText = "账号或密码错误"; return; }
   const u = data[0];
   if (u.status !== "approved") { document.getElementById("login-error").innerText = "账号未审核"; return; }
@@ -275,12 +277,12 @@ async function addCategory() {
   const name = document.getElementById("new-cat-name").value.trim();
   const type = document.getElementById("new-cat-type").value;
   if (!name) return;
-  await supabase.from("categories").insert([{ user: currentUser.username, type, name }]);
+  await supabase.from("categories").insert([{ username: currentUser.username, type, name }]);
   loadCategories();
 }
 
 async function loadCategories() {
-  const { data } = await supabase.from("categories").select("*").eq("user", currentUser.username);
+  const { data } = await supabase.from("categories").select("*").eq("username", currentUser.username);
   const income = data.filter(c => c.type === "income");
   const expense = data.filter(c => c.type === "expense");
   document.getElementById("cat-list").innerHTML = `
@@ -298,7 +300,7 @@ function setType(t) {
 }
 
 async function renderCatGrid() {
-  const { data } = await supabase.from("categories").select("*").eq("user", currentUser.username).eq("type", transType);
+  const { data } = await supabase.from("categories").select("*").eq("username", currentUser.username).eq("type", transType);
   document.getElementById("cat-grid").innerHTML = data.map(c => `
     <button class="category-btn" onclick="selCat(this, '${c.name}')">${c.name}</button>
   `).join("");
@@ -323,7 +325,7 @@ async function saveTransaction() {
   const note = document.getElementById("note").value;
   if (!amount || !selectedCat) return;
   await supabase.from("transactions").insert([{
-    user: currentUser.username, type: transType, amount, date, note, category: selectedCat
+    username: currentUser.username, type: transType, amount, date, note, category: selectedCat
   }]);
   closeModal();
   loadAllData();
@@ -337,7 +339,7 @@ async function loadAllData() {
 }
 
 async function loadTransactions() {
-  const { data } = await supabase.from("transactions").select("*").eq("user", currentUser.username);
+  const { data } = await supabase.from("transactions").select("*").eq("username", currentUser.username);
   const income = data.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const expense = data.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
   document.getElementById("income-total").innerText = "¥" + income.toFixed(2);
@@ -362,14 +364,14 @@ async function loadTransactions() {
 
 async function saveBudget() {
   const val = Number(document.getElementById("budget-input").value);
-  await supabase.from("budget").upsert([{ user: currentUser.username, amount: val }]);
+  await supabase.from("budget").upsert([{ username: currentUser.username, amount: val }]);
   loadBudget();
 }
 
 async function loadBudget() {
-  const { data } = await supabase.from("budget").select("*").eq("user", currentUser.username);
+  const { data } = await supabase.from("budget").select("*").eq("username", currentUser.username);
   const budget = data[0]?.amount || 0;
-  const { data: tData } = await supabase.from("transactions").select("*").eq("user", currentUser.username).eq("type", "expense");
+  const { data: tData } = await supabase.from("transactions").select("*").eq("username", currentUser.username).eq("type", "expense");
   const used = tData.reduce((s, t) => s + t.amount, 0);
   const pct = Math.min(100, (used / budget) * 100) || 0;
   document.getElementById("budget-fill").style.width = pct + "%";
@@ -377,7 +379,7 @@ async function loadBudget() {
 }
 
 async function exportCSV() {
-  const { data } = await supabase.from("transactions").select("*").eq("user", currentUser.username);
+  const { data } = await supabase.from("transactions").select("*").eq("username", currentUser.username);
   const csv = "日期,类型,分类,金额,备注\n" + data.map(t => `${t.date},${t.type},${t.category},${t.amount},${t.note}`).join("\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
@@ -386,7 +388,7 @@ async function exportCSV() {
 }
 
 async function exportJSON() {
-  const { data } = await supabase.from("transactions").select("*").eq("user", currentUser.username);
+  const { data } = await supabase.from("transactions").select("*").eq("username", currentUser.username);
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
   a.download = "记账数据.json";
