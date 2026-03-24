@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>家庭记账管理系统</title>
+  <title>智慧记账系统</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -46,7 +46,6 @@
 </head>
 <body>
 
-<!-- 登录注册 -->
 <div id="auth">
   <div class="auth-card" id="loginCard">
     <div class="auth-title">登录</div>
@@ -67,7 +66,6 @@
   </div>
 </div>
 
-<!-- 主界面 -->
 <div id="app" class="hidden">
   <div class="navbar">
     <div class="nav-top">
@@ -78,16 +76,15 @@
       </div>
     </div>
     <div class="nav-tabs">
-      <button class="nav-tab active" data-page="overview">📊 概览</button>
-      <button class="nav-tab" data-page="records">📝 记账</button>
-      <button class="nav-tab" data-page="category">🗂️ 分类</button>
-      <button class="nav-tab" data-page="charts">📈 图表</button>
-      <button class="nav-tab hidden" id="adminTab">👤 用户管理</button>
+      <button class="nav-tab active" onclick="switchPage('overview')">📊 概览</button>
+      <button class="nav-tab" onclick="switchPage('records')">📝 记账</button>
+      <button class="nav-tab" onclick="switchPage('category')">🗂️ 分类</button>
+      <button class="nav-tab" onclick="switchPage('charts')">📈 图表</button>
+      <button class="nav-tab hidden" id="adminTab" onclick="switchPage('adminPage')">👤 用户管理</button>
     </div>
   </div>
 
   <div class="container">
-    <!-- 概览 -->
     <section id="overview">
       <div class="stat-row">
         <div class="stat-card"><div>收入</div><div class="num income-color" id="totalIncome">0</div></div>
@@ -97,13 +94,11 @@
       <div class="card"><h4>最近记录</h4><div id="recentList"></div></div>
     </section>
 
-    <!-- 记账 -->
     <section id="records" class="hidden">
       <button class="btn btn-primary btn-sm" onclick="openModal()">➕ 记账</button>
-      <div class="card mt-2" id="recordList"></div>
+      <div class="card" style="margin-top:1rem" id="recordList"></div>
     </section>
 
-    <!-- 分类管理 -->
     <section id="category" class="hidden">
       <div class="card">
         <h4>分类管理</h4>
@@ -116,16 +111,14 @@
       </div>
     </section>
 
-    <!-- 图表 -->
     <section id="charts" class="hidden">
       <div class="card"><h4>支出构成</h4><div class="chart-box"><canvas id="pieChart"></canvas></div></div>
       <div class="card"><h4>月度趋势</h4><div class="chart-box"><canvas id="barChart"></canvas></div></div>
     </section>
 
-    <!-- 管理员后台 -->
     <section id="adminPage" class="hidden">
       <div class="card">
-        <h4>用户管理</h4>
+        <h4>👤 用户管理</h4>
         <div style="display:flex;gap:.5rem;margin:1rem 0">
           <input class="form-control" id="newUser" placeholder="用户名">
           <input class="form-control" id="newPwd" placeholder="密码">
@@ -135,7 +128,7 @@
       </div>
 
       <div class="card">
-        <h4>所有用户账单</h4>
+        <h4>📄 所有用户账单</h4>
         <div id="allRecords"></div>
       </div>
     </section>
@@ -143,7 +136,6 @@
 
   <button class="fab" onclick="openModal()">➕</button>
 
-  <!-- 记账弹窗 -->
   <div class="hidden" id="modal">
     <div class="modal-body">
       <h3>记账</h3>
@@ -184,23 +176,18 @@ const defaultCats = {
   ]
 };
 
-// 页面切换
-document.querySelectorAll(".nav-tab").forEach(tab=>{
-  tab.onclick=()=>{
-    document.querySelectorAll(".nav-tab").forEach(t=>t.classList.remove("active"));
-    tab.classList.add("active");
-    document.querySelectorAll("section").forEach(s=>s.classList.add("hidden"));
-    const p = tab.dataset.page + (tab.dataset.page==="admin"?"Page":"");
-    document.getElementById(p).classList.remove("hidden");
-    if(p==="charts") renderCharts();
-    if(p==="adminPage") loadAdmin();
-  }
-});
+function switchPage(page) {
+  document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
+  document.getElementById(page).classList.remove("hidden");
+  document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+  event.target.classList.add("active");
+  if(page === "charts") renderCharts();
+  if(page === "adminPage") loadAdmin();
+}
 
 function showReg(){loginCard.classList.add("hidden");regCard.classList.remove("hidden")}
 function showLogin(){regCard.classList.add("hidden");loginCard.classList.remove("hidden")}
 
-// 注册
 async function register(){
   const u=regUser.value.trim(),p=regPwd.value.trim();
   if(!u||!p)return regErr.innerText="请填写完整";
@@ -211,7 +198,6 @@ async function register(){
   showLogin();
 }
 
-// 登录
 async function login(){
   const u=loginUser.value.trim(),p=loginPwd.value.trim();
   const {data}=await sb.from("users").select("*").eq("username",u).eq("password",p);
@@ -229,7 +215,6 @@ async function login(){
 
 function logout(){location.reload()}
 
-// 初始化默认分类
 async function initCats(){
   const {data}=await sb.from("categories").select("*").eq("username",currentUser.username);
   if(data.length)return;
@@ -239,13 +224,11 @@ async function initCats(){
   await sb.from("categories").insert(arr);
 }
 
-// 类型切换
 function setType(t){
   ttype=t;
   loadCatSel();
 }
 
-// 加载分类选择
 async function loadCatSel(){
   const {data}=await sb.from("categories").select("*").eq("username",currentUser.username).eq("type",ttype);
   catSel.innerHTML=data.map(c=>`
@@ -262,7 +245,6 @@ function selCat(el,name){
   selectedCat=name;
 }
 
-// 弹窗
 function openModal(){
   modal.classList.remove("hidden");
   tdate.valueAsDate=new Date();
@@ -270,7 +252,6 @@ function openModal(){
 }
 function closeModal(){modal.classList.add("hidden")}
 
-// 保存记账
 async function saveRecord(){
   const amt=+amount.value,dt=tdate.value,nt=note.value;
   if(!amt||!selectedCat)return;
@@ -281,14 +262,12 @@ async function saveRecord(){
   loadAll();
 }
 
-// 加载全部
 async function loadAll(){
   loadOverview();
   loadRecords();
   loadCategory();
 }
 
-// 概览
 async function loadOverview(){
   const {data}=await sb.from("transactions").select("*").eq("username",currentUser.username);
   const inSum=data.filter(t=>t.type==="income").reduce((s,t)=>s+t.amount,0);
@@ -304,7 +283,6 @@ async function loadOverview(){
   `).join("");
 }
 
-// 记录列表
 async function loadRecords(){
   const {data}=await sb.from("transactions").select("*").eq("username",currentUser.username);
   recordList.innerHTML=data.reverse().map(t=>`
@@ -316,7 +294,6 @@ async function loadRecords(){
   `).join("");
 }
 
-// 分类管理
 async function addCategory(){
   const n=catName.value.trim(),t=catType.value;
   if(!n)return;
@@ -352,7 +329,6 @@ async function loadCategory(){
   `;
 }
 
-// 图表
 async function renderCharts(){
   const {data}=await sb.from("transactions").select("*").eq("username",currentUser.username).eq("type","expense");
   const catMap={};
@@ -370,52 +346,61 @@ async function renderCharts(){
 }
 
 // ======================================
-// 管理员功能
+// 管理员功能（已修复）
 // ======================================
-async function loadAdmin(){
-  // 用户列表
-  const {data:users}=await sb.from("users").select("*");
-  allUsers.innerHTML=users.map(u=>`
-    <div style="display:flex;justify-content:space-between;padding:.8rem;border-bottom:1px solid #eee">
+async function loadAdmin() {
+  // 加载所有用户
+  const { data: users } = await sb.from("users").select("*");
+  allUsers.innerHTML = users.map(u => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.8rem;border-bottom:1px solid #eee">
       <span>${u.username} | ${u.role} | ${u.status}</span>
       <div>
-        ${u.status==="pending"?`<button class="btn btn-primary btn-sm" onclick="approve('${u.username}')">通过</button>`:""}
-        <button class="btn btn-danger btn-sm" onclick="delUser('${u.username}')">删除</button>
+        ${u.status === "pending" ? `<button class="btn btn-primary btn-sm" onclick="approveUser('${u.username}')">审核通过</button>` : ""}
+        <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.username}')">删除用户</button>
       </div>
     </div>
   `).join("");
 
-  // 所有账单
-  const {data:recs}=await sb.from("transactions").select("*");
-  allRecords.innerHTML=recs.reverse().map(t=>`
-    <div style="padding:.7rem;border-bottom:1px solid #eee">
-      <div><strong>${t.username}</strong> ${t.date} ${t.category}</div>
-      <div class="${t.type==='income'?'income-color':'expense-color'}">${t.type==='income'?'+':'-'}${t.amount}  ${t.note||''}</div>
+  // 加载所有记录
+  const { data: records } = await sb.from("transactions").select("*");
+  allRecords.innerHTML = records.reverse().map(r => `
+    <div style="padding:0.7rem;border-bottom:1px solid #eee">
+      <div><strong>用户：${r.username}</strong> | ${r.date} | ${r.category}</div>
+      <div class="${r.type === 'income' ? 'income-color' : 'expense-color'}">${r.type === 'income' ? '+' : '-'}${r.amount}  ${r.note || ''}</div>
     </div>
   `).join("");
 }
 
-// 审核
-async function approve(user){
-  await sb.from("users").update({status:"approved"}).eq("username",user);
+// 审核用户
+async function approveUser(username) {
+  await sb.from("users").update({ status: "approved" }).eq("username", username);
   loadAdmin();
 }
 
 // 删除用户
-async function delUser(user){
-  if(!confirm("删除该用户？数据会一起删"))return;
-  await sb.from("users").delete().eq("username",user);
-  await sb.from("transactions").delete().eq("username",user);
-  await sb.from("categories").delete().eq("username",user);
+async function deleteUser(username) {
+  if (!confirm(`确定删除用户 ${username} 吗？所有数据都会删除`)) return;
+  await sb.from("users").delete().eq("username", username);
+  await sb.from("transactions").delete().eq("username", username);
+  await sb.from("categories").delete().eq("username", username);
   loadAdmin();
 }
 
 // 管理员添加用户
-async function adminAddUser(){
-  const u=newUser.value.trim(),p=newPwd.value.trim();
-  if(!u||!p)return alert("请填写完整");
-  await sb.from("users").insert([{username:u,password:p,role:"user",status:"approved"}]);
-  newUser.value="";newPwd.value="";
+async function adminAddUser() {
+  const username = newUser.value.trim();
+  const password = newPwd.value.trim();
+  if (!username || !password) { alert("请输入用户名和密码"); return; }
+  
+  const { data } = await sb.from("users").select("*").eq("username", username);
+  if (data.length) { alert("用户已存在"); return; }
+
+  await sb.from("users").insert([{
+    username, password, role: "user", status: "approved"
+  }]);
+  
+  newUser.value = "";
+  newPwd.value = "";
   loadAdmin();
 }
 </script>
